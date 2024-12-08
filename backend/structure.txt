@@ -1,0 +1,17 @@
+
+backend/
+├── app/
+│   ├── __init__.py
+│   ├── routes/
+│   │   ├── __init__.py
+│   │   └── api.py
+│   ├── services/
+│   │   ├── __init__.py
+│   │   ├── websocket_service.py
+│   │   └── coinapi_service.py
+│   └── utils/
+│       ├── __init__.py
+│       └── helpers.py
+├── config.py
+├── requirements.txt
+└── run.py

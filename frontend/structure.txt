@@ -1,0 +1,24 @@
+
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── Layout/
+│   │   │   ├── Header.tsx
+│   │   │   └── Footer.tsx
+│   │   ├── CryptoDashboard/
+│   │   │   ├── PriceTable.tsx
+│   │   │   └── ArbitrageOpportunities.tsx
+│   │   └── common/
+│   ├── pages/
+│   │   ├── _app.tsx
+│   │   ├── _document.tsx
+│   │   └── index.tsx
+│   ├── services/
+│   │   ├── api.ts
+│   │   └── websocket.ts
+│   └── styles/
+│       └── globals.css
+├── public/
+├── package.json
+├── tsconfig.json
+└── tailwind.config.js
