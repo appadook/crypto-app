@@ -4,3 +4,5 @@ python-dotenv>=1.0.0
 websocket-client>=1.6.4
 requests>=2.31.0
 werkzeug>=3.0.1
+websockets==12.0
+python-dotenv==1.0.0

@@ -1,0 +1,23 @@
+=== Latest Cryptocurrency Prices ===
+Last Update: 2024-12-10 15:31:53
+Messages Received: 3552
+Estimated Cost: $0.3552
+Remaining Credit: $24.6448
+
+
+BTC/USD prices:
+Current state: {'BINANCE': 97728.0, 'COINBASE': 97757.44, 'BITSTAMP': 97766, 'KRAKEN': 97744.5}
+BINANCE    $97,728.00
+BITSTAMP   $97,766.00
+COINBASE   $97,757.44
+KRAKEN     $97,744.50
+
+ETH/USD prices:
+Current state: {'BINANCE': 3761.19, 'COINBASE': 3761.93, 'BITSTAMP': 3761.5}
+BINANCE    $3,761.19
+BITSTAMP   $3,761.50
+COINBASE   $3,761.93
+^C
+Exiting...
+Total messages received: 3944
+Total estimated cost: $0.3944
