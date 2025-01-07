@@ -1,22 +1,18 @@
-# app/processors/coinapi_processor.py
+# backend/app/processors/coinapi_processor.py
 
-from app.external.price_tracker import price_tracker
+from app.external.price_tracker import PriceTracker  # Correct import
 import logging
 from .base_processor import DataProcessor  # Import the DataProcessor base class
 
-logger = logging.getLogger(__name__)
-
 class CoinAPIProcessor(DataProcessor):  # Inherit from DataProcessor
-    def __init__(self):
-        self.prices = {
-            'BTC': {},
-            'ETH': {}
-        }
+    def __init__(self, price_tracker):
+        self.logger = logging.getLogger(__name__)
+        self.price_tracker = price_tracker  # Store the instance of PriceTracker
 
     def process_message(self, data):
         try:
             if data.get('type') == 'error':
-                logger.error(f"CoinAPI error: {data}")
+                self.logger.error(f"CoinAPI error: {data}")
                 return {'error': data}
 
             if 'price' not in data:
@@ -40,15 +36,13 @@ class CoinAPIProcessor(DataProcessor):  # Inherit from DataProcessor
                 crypto = 'ETH'
 
             if crypto and (symbol.endswith('_USD') or symbol.endswith('_USDT')):
-                price_tracker.update_price(crypto, exchange, price, timestamp)
-                return {'prices': price_tracker.get_latest_prices()}
+                self.price_tracker.update_price(crypto, exchange, price, timestamp)  # Update price
+                return {'prices': self.price_tracker.get_latest_prices()}  # Return latest prices
 
         except Exception as e:
-            logger.error(f"Error processing message: {e}")
-            return {'error': str(e)}
-
-        return None
+            self.logger.error(f"Error processing message: {e}")
+            return None
 
     def get_latest_data(self) -> dict:
         """Retrieve the latest processed data as a dictionary."""
-        return price_tracker.get_latest_prices()  # Example implementation
+        return self.price_tracker.get_latest_prices()  # Return latest prices

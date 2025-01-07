@@ -1,8 +1,9 @@
-
+# This file is currently not being used at all
+# ----------------------------------------------------------------
 import logging
 from datetime import datetime
 
-class PriceTracker:
+class PriceTracker2:
     def __init__(self):
         self.crypto_prices = {
             'BTC': {},  # Exchange -> price mapping for Bitcoin

@@ -1,8 +1,11 @@
+# backend/app/__init__.py
 from flask import Flask
 from flask_socketio import SocketIO
 import logging
 from app.config.settings import Config
 from app.websocket import init_websocket
+from app.routes.crypto_prices_route import main_bp  # Import the price routes blueprint
+from app.external.strategies.coinapi_strategy import CoinAPIStrategy
 
 socketio = SocketIO()
 
@@ -23,5 +26,8 @@ def create_app(config_class=Config):
                      async_mode='threading')  # Add this line
 
     init_websocket(socketio)
+
+    # Register the blueprint for price routes
+    app.register_blueprint(main_bp)
 
     return app

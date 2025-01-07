@@ -1,10 +1,9 @@
-# backend/app/routes/routes.py
+# backend/app/routes/crypto_prices_route.py
 from flask import Blueprint, jsonify
 from app.external.price_tracker import PriceTracker
-from datetime import datetime
 
 main_bp = Blueprint('main', __name__)
-price_tracker = PriceTracker()  # Instantiate the PriceTracker
+price_tracker = PriceTracker()  # Instantiate the price tracker
 
 @main_bp.route('/api/latest-prices', methods=['GET'])
 def get_latest_prices():

@@ -1,3 +1,4 @@
+# backend/app/external/strategies/coinapi_strategy.py
 import json
 import logging
 from .base_strategy import WebSocketStrategy
@@ -7,9 +8,10 @@ from app.processors.coinapi_processor import CoinAPIProcessor
 logger = logging.getLogger(__name__)
 
 class CoinAPIStrategy(WebSocketStrategy):
-    def __init__(self):
+    def __init__(self, price_tracker):
         self.api_key = Config.COINAPI_KEY
-        self.processor = CoinAPIProcessor()  # Instantiate the processor
+        self.processor = CoinAPIProcessor(price_tracker)  # Instantiate the processor
+        self.price_tracker = price_tracker  # Reference to the price tracker
 
     def get_connection_params(self):
         return {
@@ -32,7 +34,8 @@ class CoinAPIStrategy(WebSocketStrategy):
 
     async def process_message(self, message):
         data = json.loads(message)
-        return self.processor.process_message(data)  # Delegate processing to the processor
+        self.processor.process_message(data)  # Delegate processing to the processor
+        self.price_tracker.process_trade_message(data)  # Update prices
 
     def get_supported_pairs(self) -> list[str]:
         return ["BTC/USD", "ETH/USD"]

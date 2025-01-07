@@ -4,14 +4,16 @@ import logging
 import json
 from app.external.strategies.coinapi_strategy import CoinAPIStrategy
 from app.external.price_display import price_display
+from app.external.price_tracker import PriceTracker
 # Add more strategy imports as needed
 
 logger = logging.getLogger(__name__)
+price_tracker = PriceTracker()
 
 class WebSocketClient:
     def __init__(self):
         self.strategies = {
-            'coinapi': CoinAPIStrategy(),
+            'coinapi': CoinAPIStrategy(price_tracker),
             # Add more strategies here
         }
         self.running = False
