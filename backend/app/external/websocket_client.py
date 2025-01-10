@@ -35,9 +35,6 @@ class WebSocketClient:
                     message = await websocket.recv()
                     processed_data = await strategy.process_message(message)
                     if processed_data:
-                        # Display prices in console
-                        if 'prices' in processed_data:
-                            price_display.display_prices(processed_data['prices'])
                         # Broadcast to websocket clients
                         if self.broadcast_callback:
                             self.broadcast_callback(f'{strategy_name}_update', processed_data)

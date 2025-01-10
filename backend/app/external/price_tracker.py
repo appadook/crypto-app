@@ -1,6 +1,7 @@
 # backend/app/utils/price_tracker.py
 import logging
 from datetime import datetime
+from .price_display import price_display  # Import the price display module
 
 class PriceTracker:
     def __init__(self):
@@ -14,9 +15,16 @@ class PriceTracker:
     def update_price(self, crypto, exchange, price, timestamp):
         """Update the price of the cryptocurrency."""
         if crypto in self.crypto_prices:
-            self.crypto_prices[crypto][exchange] = price
+            self.crypto_prices[crypto][exchange] = {
+                'price': price,
+                'timestamp': timestamp
+            }
             self.message_count += 1
-            self.logger.info(f"Updated {crypto} price to {price} on {exchange} at {timestamp}.")
+            # Use price_display to show the update
+            price_display.display_prices({
+                'prices': self.crypto_prices,
+                'last_update': timestamp
+            })
         else:
             self.logger.error(f"Unknown cryptocurrency: {crypto}")
 
@@ -36,15 +44,27 @@ class PriceTracker:
 
             # Update price data
             if 'BTC' in symbol:
-                self.crypto_prices['BTC'][exchange] = price
+                self.crypto_prices['BTC'][exchange] = {
+                    'price': price,
+                    'timestamp': data.get('time_exchange', datetime.now().isoformat())
+                }
                 crypto_type = 'BTC'
             elif 'ETH' in symbol:
-                self.crypto_prices['ETH'][exchange] = price
+                self.crypto_prices['ETH'][exchange] = {
+                    'price': price,
+                    'timestamp': data.get('time_exchange', datetime.now().isoformat())
+                }
                 crypto_type = 'ETH'
             else:
                 return None
 
             self.message_count += 1
+            
+            # Use price_display to show updates
+            price_display.display_prices({
+                'prices': self.crypto_prices,
+                'last_update': data.get('time_exchange', datetime.now().isoformat())
+            })
             
             return {
                 'timestamp': datetime.now().isoformat(),
@@ -57,3 +77,6 @@ class PriceTracker:
 
     def get_latest_prices(self):
         return self.crypto_prices
+    
+
+
