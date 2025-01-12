@@ -4,7 +4,7 @@ from flask_socketio import SocketIO
 import logging
 from app.config.settings import Config
 from app.websocket import init_websocket
-from app.routes.crypto_prices_route import main_bp  # Import the price routes blueprint
+from app.routes.routes import main_bp  # Import the price routes blueprint
 from app.external.strategies.coinapi_strategy import CoinAPIStrategy
 
 socketio = SocketIO()
