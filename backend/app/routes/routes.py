@@ -11,8 +11,9 @@ def get_latest_prices():
     latest_data = price_tracker.get_latest_prices()  # Fetch latest prices
     response = {
         "status": "success",
-        "data": latest_data,
-        "timestamp": datetime.now().isoformat()  # Include a timestamp if necessary
+        "crypto_prices": latest_data['crypto'],
+        "exchange_rates": latest_data['exchange_rates'],
+        "timestamp": datetime.now().isoformat()
     }
     return jsonify(response)
 

@@ -9,6 +9,10 @@ class PriceTracker:
             'BTC': {},  # Exchange -> price mapping for Bitcoin
             'ETH': {}   # Exchange -> price mapping for Ethereum
         }
+        self.exchange_rates = {
+            'EURUSD': None,  # Changed from EUR/USD
+            'GBPCHF': None   # Changed from GBP/CHF
+        }
         self.message_count = 0
         self.logger = logging.getLogger(__name__)
 
@@ -20,13 +24,31 @@ class PriceTracker:
                 'timestamp': timestamp
             }
             self.message_count += 1
-            # Use price_display to show the update
-            price_display.display_prices({
-                'prices': self.crypto_prices,
-                'last_update': timestamp
-            })
+            self._update_display()
         else:
             self.logger.error(f"Unknown cryptocurrency: {crypto}")
+    
+    def update_exchange_rate(self, pair: str, rate: float, timestamp=None):
+        """Update forex exchange rate."""
+        if timestamp is None:
+            timestamp = datetime.now().isoformat()
+        
+        if pair in self.exchange_rates:
+            self.exchange_rates[pair] = {
+                'rate': rate,
+                'timestamp': timestamp
+            }
+            self._update_display()
+        else:
+            self.logger.error(f"Unknown currency pair: {pair}")
+
+    def _update_display(self):
+        """Private method to handle display updates."""
+        price_display.display_prices({
+            'prices': self.crypto_prices,
+            'exchange_rates': self.exchange_rates,
+            'last_update': datetime.now().isoformat()
+        })
 
     def process_trade_message(self, data):
         try:
@@ -59,24 +81,22 @@ class PriceTracker:
                 return None
 
             self.message_count += 1
-            
-            # Use price_display to show updates
-            price_display.display_prices({
-                'prices': self.crypto_prices,
-                'last_update': data.get('time_exchange', datetime.now().isoformat())
-            })
+            self._update_display()
             
             return {
                 'timestamp': datetime.now().isoformat(),
                 'price': price,
-                'exchange': exchange
+                'exchange_rates': exchange
             }
         except Exception as e:
             self.logger.error(f"Error processing trade message: {e}")
             return None
 
     def get_latest_prices(self):
-        return self.crypto_prices
+        return {
+            'crypto': self.crypto_prices,
+            'exchange_rates': self.exchange_rates
+        }
     
 
 

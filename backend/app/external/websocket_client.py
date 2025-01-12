@@ -3,8 +3,8 @@ import asyncio
 import logging
 import json
 from app.external.strategies.coinapi_strategy import CoinAPIStrategy
-from app.external.price_display import price_display
 from app.external.price_tracker import PriceTracker
+from app.external.strategies.exchange_api_strategy import ExchangeAPIStrategy
 # Add more strategy imports as needed
 
 logger = logging.getLogger(__name__)
@@ -14,6 +14,7 @@ class WebSocketClient:
     def __init__(self):
         self.strategies = {
             'coinapi': CoinAPIStrategy(price_tracker),
+            'xchangeapi': ExchangeAPIStrategy(price_tracker)
             # Add more strategies here
         }
         self.running = False

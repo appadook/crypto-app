@@ -1,6 +1,4 @@
 # backend/app/processors/coinapi_processor.py
-
-from app.external.price_tracker import PriceTracker  # Correct import
 import logging
 from .base_processor import DataProcessor  # Import the DataProcessor base class
 

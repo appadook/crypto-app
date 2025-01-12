@@ -36,6 +36,7 @@ class CoinAPIStrategy(WebSocketStrategy):
         data = json.loads(message)
         self.processor.process_message(data)  # Delegate processing to the processor
         self.price_tracker.process_trade_message(data)  # Update prices
+        pass
 
     def get_supported_pairs(self) -> list[str]:
         return ["BTC/USD", "ETH/USD"]
