@@ -12,6 +12,7 @@ class CoinAPIStrategy(WebSocketStrategy):
         self.api_key = Config.COINAPI_KEY
         self.processor = CoinAPIProcessor(price_tracker)  # Instantiate the processor
         self.price_tracker = price_tracker  # Reference to the price tracker
+        self.price_tracker.initialize_crypto_pairs(self.get_supported_pairs())
 
     def get_connection_params(self):
         return {

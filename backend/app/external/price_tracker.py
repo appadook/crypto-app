@@ -5,16 +5,20 @@ from .price_display import price_display  # Import the price display module
 
 class PriceTracker:
     def __init__(self):
-        self.crypto_prices = {
-            'BTC': {},  # Exchange -> price mapping for Bitcoin
-            'ETH': {}   # Exchange -> price mapping for Ethereum
-        }
+        self.crypto_prices = {}
         self.exchange_rates = {
             'EURUSD': None,  # Changed from EUR/USD
             'GBPCHF': None   # Changed from GBP/CHF
         }
         self.message_count = 0
         self.logger = logging.getLogger(__name__)
+    
+    def initialize_crypto_pairs(self, pairs: list[str]):
+        """Initialize cryptocurrency pairs from strategy"""
+        for pair in pairs:
+            # Convert "BTC/USD" format to "BTC"
+            crypto = pair.split('/')[0]
+            self.crypto_prices[crypto] = {}
 
     def update_price(self, crypto, exchange, price, timestamp):
         """Update the price of the cryptocurrency."""
