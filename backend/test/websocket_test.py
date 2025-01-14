@@ -125,3 +125,9 @@ if __name__ == "__main__":
         print("\nExiting...")
         print(f"Total messages received: {message_count}")
         print(f"Total estimated cost: ${message_count * COST_PER_MESSAGE:.4f}")
+
+
+
+
+## MESSAGE RECEIVED
+# {"time_exchange":"2025-01-14T16:49:58.3318050Z","time_coinapi":"2025-01-14T16:49:58.3368845Z","uuid":"fa42708a-ca7b-4d48-9bf8-68d23b416751","price":95495.96,"size":0.00310908,"taker_side":"BUY","symbol_id":"COINBASE_SPOT_BTC_USD","sequence":5231604,"type":"trade"}

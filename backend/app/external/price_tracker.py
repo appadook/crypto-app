@@ -20,17 +20,59 @@ class PriceTracker:
             crypto = pair.split('/')[0]
             self.crypto_prices[crypto] = {}
 
-    def update_price(self, crypto, exchange, price, timestamp):
-        """Update the price of the cryptocurrency."""
-        if crypto in self.crypto_prices:
-            self.crypto_prices[crypto][exchange] = {
+    def update_price(self, crypto: str, exchange: str, price: float, timestamp: str, fiat: str):
+        """
+        Update the price of the cryptocurrency.
+        Args:
+            crypto: Cryptocurrency symbol (e.g., 'BTC')
+            exchange: Exchange name (e.g., 'COINBASE')
+            price: Current price
+            timestamp: Price timestamp
+            fiat: Fiat currency (e.g., 'USD', 'USDT')
+        """
+        try:
+            # Debug current state
+            print(f"Before update - crypto_prices: {self.crypto_prices}")
+            
+            # Validate inputs
+            if not all([crypto, exchange, price, timestamp, fiat]):
+                raise ValueError("All inputs must be provided")
+                
+            # Clear existing incorrect structure if needed
+            if crypto in self.crypto_prices:
+                if isinstance(self.crypto_prices[crypto].get(exchange), (float, dict)):
+                    self.crypto_prices[crypto][exchange] = {}
+            
+            # Build structure step by step
+            if crypto not in self.crypto_prices:
+                self.crypto_prices[crypto] = {}
+            
+            if exchange not in self.crypto_prices[crypto]:
+                self.crypto_prices[crypto][exchange] = {}
+                
+            # Atomic update of price data
+            self.crypto_prices[crypto][exchange][fiat] = {
                 'price': price,
                 'timestamp': timestamp
             }
+            
+            # Debug final state
+            print(f"After update - crypto_prices: {self.crypto_prices}")
+            
             self.message_count += 1
             self._update_display()
-        else:
-            self.logger.error(f"Unknown cryptocurrency: {crypto}")
+        except TypeError as e:
+            self.logger.error("\n" + "="*40)
+            self.logger.error(f"TypeError in update_price: {e}")
+            self.logger.error(f"Current structure: {self.crypto_prices}")
+            self.logger.error(f"Inputs - crypto: {crypto}, exchange: {exchange}, fiat: {fiat}, price: {price}, timestamp: {timestamp}")
+            self.logger.error("="*40 + "\n")
+        except Exception as e:
+            self.logger.error("\n" + "="*40)
+            self.logger.error(f"Unexpected error in update_price: {e}")
+            self.logger.error(f"Current structure: {self.crypto_prices}")
+            self.logger.error(f"Inputs - crypto: {crypto}, exchange: {exchange}, fiat: {fiat}, price: {price}, timestamp: {timestamp}")
+            self.logger.error("="*40 + "\n")
     
     def update_exchange_rate(self, pair: str, rate: float, timestamp=None):
         """Update forex exchange rate."""
@@ -48,11 +90,14 @@ class PriceTracker:
 
     def _update_display(self):
         """Private method to handle display updates."""
-        price_display.display_prices({
-            'prices': self.crypto_prices,
-            'exchange_rates': self.exchange_rates,
-            'last_update': datetime.now().isoformat()
-        })
+        try:
+            price_display.display_prices({
+                'prices': self.crypto_prices,
+                'exchange_rates': self.exchange_rates,
+                'last_update': datetime.now().isoformat()
+            })
+        except Exception as e:
+            self.logger.error("Display update error: %s", str(e))
 
     def process_trade_message(self, data):
         try:
