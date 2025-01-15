@@ -32,7 +32,7 @@ class PriceTracker:
         """
         try:
             # Debug current state
-            print(f"Before update - crypto_prices: {self.crypto_prices}")
+            # print(f"Before update - crypto_prices: {self.crypto_prices}")
             
             # Validate inputs
             if not all([crypto, exchange, price, timestamp, fiat]):
@@ -57,7 +57,7 @@ class PriceTracker:
             }
             
             # Debug final state
-            print(f"After update - crypto_prices: {self.crypto_prices}")
+            # print(f"After update - crypto_prices: {self.crypto_prices}")
             
             self.message_count += 1
             self._update_display()

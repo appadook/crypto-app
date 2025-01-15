@@ -5,6 +5,17 @@ class PriceDisplay:
         self.logger = logging.getLogger(__name__)
         self.message_count = 0
 
+    def _format_timestamp(self, timestamp) -> str:
+        """Format timestamp with error handling"""
+        try:
+            if not isinstance(timestamp, str):
+                timestamp = str(timestamp)
+            dt = datetime.fromisoformat(timestamp)
+            return dt.strftime('%Y-%m-%d %H:%M:%S')
+        except Exception as e:
+            self.logger.error(f"Error formatting timestamp: {e}")
+            return datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
     def _format_crypto_prices(self, prices: dict) -> list:
         """Helper method to format cryptocurrency prices"""
         output = []
@@ -21,25 +32,32 @@ class PriceDisplay:
     def _format_exchange_rates(self, exchange_rates: dict) -> list:
         """Helper method to format exchange rates"""
         output = []
-        if exchange_rates:
-            output.append("\n=== EXCHANGE RATES ===")
-            for pair, rate_data in sorted(exchange_rates.items()):
-                if rate_data and isinstance(rate_data, dict):
-                    rate = rate_data.get('rate')
-                    rate_time = datetime.fromisoformat(rate_data.get('timestamp')).strftime('%H:%M:%S')
-                    output.append(f"{pair}: {rate:.4f} ({rate_time})")
-                elif isinstance(rate_data, (int, float)):
-                    output.append(f"{pair}: {rate_data:.4f}")
+        try:
+            if exchange_rates:
+                output.append("\n=== EXCHANGE RATES ===")
+                for pair, rate_data in sorted(exchange_rates.items()):
+                    if rate_data and isinstance(rate_data, dict):
+                        rate = rate_data.get('rate')
+                        try:
+                            timestamp = str(rate_data.get('timestamp')) if rate_data.get('timestamp') else datetime.now().isoformat()
+                            rate_time = datetime.fromisoformat(timestamp).strftime('%H:%M:%S')
+                            output.append(f"{pair}: {rate:.4f} ({rate_time})")
+                        except Exception as e:
+                            self.logger.error(f"Timestamp error for {pair}: {e}")
+                            output.append(f"{pair}: {rate:.4f}")
+                    elif isinstance(rate_data, (int, float)):
+                        output.append(f"{pair}: {rate_data:.4f}")
+        except Exception as e:
+            self.logger.error(f"Error formatting exchange rates: {e}")
         return output
 
     def display_prices(self, price_data):
         prices = price_data.get('prices', {})
         exchange_rates = price_data.get('exchange_rates', {})
-        timestamp = price_data.get('last_update', datetime.now().isoformat())
+        timestamp = price_data.get('last_update')
         self.message_count += 1
         
-        dt = datetime.fromisoformat(timestamp)
-        formatted_time = dt.strftime('%Y-%m-%d %H:%M:%S')
+        formatted_time = self._format_timestamp(timestamp)
         
         output = [
             "\n=== LATEST CRYPTOCURRENCY PRICES ===",
