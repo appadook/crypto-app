@@ -29,7 +29,9 @@ class CoinAPIStrategy(WebSocketStrategy):
                 "BITSTAMP_SPOT_BTC_USD", "BITSTAMP_SPOT_ETH_USD",
                 "KRAKEN_SPOT_BTC_USD", "KRAKEN_SPOT_ETH_USD",
                 "BINANCE_SPOT_BTC_USDT", "BINANCE_SPOT_ETH_USDT",
-                "COINBASE_SPOT_BTC_USD", "COINBASE_SPOT_ETH_USD"
+                "COINBASE_SPOT_BTC_USD", "COINBASE_SPOT_ETH_USD",
+                "COINBASE_SPOT_BTC_EUR", "BITSTAMP_SPOT_BTC_EUR",
+                "KRAKEN_SPOT_BTC_EUR",
             ]
         }
 
@@ -39,7 +41,7 @@ class CoinAPIStrategy(WebSocketStrategy):
         self.processor.process_message(data)
 
     def get_supported_pairs(self) -> list[str]:
-        return ["BTC/USD", "ETH/USD"]
+        return ["BTC/USD", "ETH/USD", "BTC/EUR"]
 
     def get_name(self) -> str:
         return "coinapi"

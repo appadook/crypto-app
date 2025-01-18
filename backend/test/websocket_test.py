@@ -30,7 +30,7 @@ def format_price(message):
     timestamp = data['time_exchange']
     
     # Process both USD and USDT pairs
-    if not (symbol.endswith('_USD') or symbol.endswith('_USDT')):
+    if not (symbol.endswith('_USD') or symbol.endswith('_USDT') or symbol.endswith('_EUR')):
         return
     
     # Clean up exchange name for Binance
@@ -78,10 +78,12 @@ async def connect_to_coinapi():
                 "heartbeat": False,
                 "subscribe_data_type": ["trade"],
                 "subscribe_filter_symbol_id": [
-                    "BITSTAMP_SPOT_BTC_USD", "BITSTAMP_SPOT_ETH_USD",
-                    "KRAKEN_SPOT_BTC_USD", "KRAKEN_SPOT_ETH_USD",
-                    "BINANCE_SPOT_BTC_USDT", "BINANCE_SPOT_ETH_USDT",  # Changed from BINANCE to BINANCEUS
-                    "COINBASE_SPOT_BTC_USD", "COINBASE_SPOT_ETH_USD"
+                    # "BITSTAMP_SPOT_BTC_USD", "BITSTAMP_SPOT_ETH_USD",
+                    # "KRAKEN_SPOT_BTC_USD", "KRAKEN_SPOT_ETH_USD",
+                    # "BINANCE_SPOT_BTC_USDT", "BINANCE_SPOT_ETH_USDT",  # Changed from BINANCE to BINANCEUS
+                    # "COINBASE_SPOT_BTC_USD", "COINBASE_SPOT_ETH_USD"
+                    # "COINBASE_SPOT_BTC_EUR", "BITSTAMP_SPOT_BTC_EUR",
+                    # "KRAKEN_SPOT_BTC_EUR",
                 ]
             }
             

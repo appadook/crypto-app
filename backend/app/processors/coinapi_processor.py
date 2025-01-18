@@ -19,10 +19,12 @@ class CoinAPIProcessor(DataProcessor):  # Inherit from DataProcessor
         return 'BINANCE' if 'BINANCE' in exchange else exchange
 
     def parse_fiat(self, symbol: str) -> str:
-        if symbol.endswith('_USD'):
+        # print(f"Symbol: {symbol}")
+        if symbol.endswith('_USD') or symbol.endswith('_USDT'):
             return 'USD'
-        elif symbol.endswith('_USDT'):
-            return 'USD'
+        elif symbol.endswith('_EUR'):
+            return 'EUR'
+        print(f"Unsupported fiat currency for symbol: {symbol}")
         return None
 
     def parse_price(self, data: dict) -> float:

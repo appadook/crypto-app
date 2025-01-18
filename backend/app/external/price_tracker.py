@@ -32,7 +32,7 @@ class PriceTracker:
         """
         try:
             # Debug current state
-            # print(f"Before update - crypto_prices: {self.crypto_prices}")
+            print(f"Before update - crypto_prices: {self.crypto_prices}")
             
             # Validate inputs
             if not all([crypto, exchange, price, timestamp, fiat]):
@@ -40,7 +40,7 @@ class PriceTracker:
                 
             # Clear existing incorrect structure if needed
             if crypto in self.crypto_prices:
-                if isinstance(self.crypto_prices[crypto].get(exchange), (float, dict)):
+                if not isinstance(self.crypto_prices[crypto].get(exchange), (float, dict)):
                     self.crypto_prices[crypto][exchange] = {}
             
             # Build structure step by step
@@ -105,23 +105,40 @@ class PriceTracker:
             price = data['price']
             exchange = symbol.split('_')[0]
             
-            # Process only USD and USDT pairs
-            if not (symbol.endswith('_USD') or symbol.endswith('_USDT')):
+            # Process only USD, USDT, and EUR pairs
+            if not (symbol.endswith('_USD') or symbol.endswith('_USDT') or symbol.endswith('_EUR')):
                 return None
 
             # Normalize exchange names
             if 'BINANCE' in exchange:
                 exchange = 'BINANCE'
 
-            # Update price data
+            # Get fiat currency
+            fiat = 'USD'
+            if symbol.endswith('_EUR'):
+                fiat = 'EUR'
+            elif symbol.endswith('_USDT'):
+                fiat = 'USD'
+
+            # Update price data with proper fiat currency
             if 'BTC' in symbol:
-                self.crypto_prices['BTC'][exchange] = {
+                if 'BTC' not in self.crypto_prices:
+                    self.crypto_prices['BTC'] = {}
+                if exchange not in self.crypto_prices['BTC']:
+                    self.crypto_prices['BTC'][exchange] = {}
+                
+                self.crypto_prices['BTC'][exchange][fiat] = {
                     'price': price,
                     'timestamp': data.get('time_exchange', datetime.now().isoformat())
                 }
                 crypto_type = 'BTC'
             elif 'ETH' in symbol:
-                self.crypto_prices['ETH'][exchange] = {
+                if 'ETH' not in self.crypto_prices:
+                    self.crypto_prices['ETH'] = {}
+                if exchange not in self.crypto_prices['ETH']:
+                    self.crypto_prices['ETH'][exchange] = {}
+                
+                self.crypto_prices['ETH'][exchange][fiat] = {
                     'price': price,
                     'timestamp': data.get('time_exchange', datetime.now().isoformat())
                 }
