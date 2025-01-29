@@ -71,5 +71,33 @@ class PriceDisplay:
         print('\n'.join(output))
         print("\n" + "="*40)
 
+    def display_arbitrage(self, price_data):
+        prices = price_data.get('prices', {})
+        exchange_rates = price_data.get('exchange_rates', {})
+        eur_usd_rate = exchange_rates.get('EURUSD', {}).get('rate')
+
+        if not eur_usd_rate:
+            self.logger.error("EURUSD exchange rate not available.")
+            return
+
+        output = ["\n=== FIAT PRICE COMPARISON (EUR to USD) ==="]
+        
+        for crypto, exchanges in prices.items():
+            for exchange, fiats in exchanges.items():
+                if 'EUR' in fiats and 'USD' in fiats:
+                    eur_price = fiats['EUR']['price']
+                    usd_price = fiats['USD']['price']
+                    converted_eur_price = eur_price * eur_usd_rate
+                    output.append(f"\n{crypto} on {exchange}:")
+                    output.append(f"  EUR: {eur_price:.2f} (Converted to USD: {converted_eur_price:.2f})")
+                    output.append(f"  USD: {usd_price:.2f}")
+                    if converted_eur_price != usd_price:
+                        price_diff = abs(converted_eur_price - usd_price)
+                        arbitrage_action = "BUY EUR" if converted_eur_price < usd_price else "BUY USD"
+                        output.append(f"  ARBITRAGE: Price difference is {price_diff:.2f} USD ({arbitrage_action})")
+        
+        print('\n'.join(output))
+        print("\n" + "="*40)
+
 # Global instance
 price_display = PriceDisplay()

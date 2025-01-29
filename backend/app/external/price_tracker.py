@@ -1,7 +1,9 @@
 # backend/app/utils/price_tracker.py
+
 import logging
 from datetime import datetime
 from .price_display import price_display  # Import the price display module
+from app.external.utilities.exchange_spread import ExchangeSpread  # Import the ExchangeSpread class
 
 class PriceTracker:
     def __init__(self):
@@ -60,7 +62,10 @@ class PriceTracker:
             # print(f"After update - crypto_prices: {self.crypto_prices}")
             
             self.message_count += 1
-            self._update_display()
+            # self._update_display()
+            # self._display_arbitrage()
+            self._display_spread_across_exchanges()
+
         except TypeError as e:
             self.logger.error("\n" + "="*40)
             self.logger.error(f"TypeError in update_price: {e}")
@@ -92,6 +97,23 @@ class PriceTracker:
         """Private method to handle display updates."""
         try:
             price_display.display_prices({
+                'prices': self.crypto_prices,
+                'exchange_rates': self.exchange_rates,
+                'last_update': datetime.now().isoformat()
+            })
+        except Exception as e:
+            self.logger.error("Display update error: %s", str(e))
+
+    def _display_spread_across_exchanges(self):
+        """Private method to handle display spread across exchanges."""
+        spread = ExchangeSpread()
+        spread.update_spreads(self.crypto_prices)
+        spread.display_spread()
+
+    def _display_arbitrage(self):
+        """Private method to handle display live arbitrage of websocket of each crypto & exchange in data."""
+        try:
+            price_display.display_arbitrage({
                 'prices': self.crypto_prices,
                 'exchange_rates': self.exchange_rates,
                 'last_update': datetime.now().isoformat()
