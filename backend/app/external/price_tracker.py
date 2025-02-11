@@ -4,6 +4,7 @@ import logging
 from datetime import datetime
 from .price_display import price_display  # Import the price display module
 from app.external.utilities.exchange_spread import ExchangeSpread  # Import the ExchangeSpread class
+from app.external.utilities.csv_tracker import CSVTracker  # Import the CSVTracker class
 
 class PriceTracker:
     def __init__(self):
@@ -14,6 +15,7 @@ class PriceTracker:
         }
         self.message_count = 0
         self.logger = logging.getLogger(__name__)
+        self.csv_tracker = CSVTracker()
     
     def initialize_crypto_pairs(self, pairs: list[str]):
         """Initialize cryptocurrency pairs from strategy"""
@@ -62,9 +64,10 @@ class PriceTracker:
             # print(f"After update - crypto_prices: {self.crypto_prices}")
             
             self.message_count += 1
-            # self._update_display()
+            self._update_display()
+            # self._update_csv()
             # self._display_arbitrage()
-            self._display_spread_across_exchanges()
+            # self._display_spread_across_exchanges()
 
         except TypeError as e:
             self.logger.error("\n" + "="*40)
@@ -120,6 +123,14 @@ class PriceTracker:
             })
         except Exception as e:
             self.logger.error("Display update error: %s", str(e))
+
+    def _update_csv(self):
+        """Private method to handle CSV updates."""
+        try:
+            csv_tracker = CSVTracker()
+            csv_tracker.store_price_data(self.crypto_prices)
+        except Exception as e:
+            self.logger.error("CSV update error: %s", str(e))
 
     def process_trade_message(self, data):
         try:
@@ -186,5 +197,8 @@ class PriceTracker:
             'exchange_rates': self.exchange_rates
         }
     
-
+    def _update_csv(self):
+        csv_tracker = self.csv_tracker
+        csv_tracker.store_price_data(self.crypto_prices)
+    
 

@@ -26,3 +26,6 @@ build/
 # archive files
 archive/*
 archive/
+
+# csv files
+*.csv
