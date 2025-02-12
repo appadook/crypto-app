@@ -2,6 +2,7 @@
 from flask import Blueprint, jsonify
 from app.external.price_tracker import PriceTracker
 from datetime import datetime
+from flask_socketio import emit
 
 main_bp = Blueprint('main', __name__)
 price_tracker = PriceTracker()  # Instantiate the PriceTracker
@@ -20,3 +21,19 @@ def get_latest_prices():
 @main_bp.route('/api/health', methods=['GET'])
 def health_check():
     return jsonify({'status': 'healthy'})
+
+
+# WebSocket event to send data to the client
+@main_bp.route('/socketio/connect')
+def handle_connect():
+    from app import socketio
+    @socketio.on('connect')
+    def connect():
+        emit('client data', price_tracker.get_client_data())
+
+@main_bp.route('/socketio/disconnect')
+def handle_disconnect():
+    from app import socketio
+    @socketio.on('disconnect')
+    def disconnect():
+        print('Client disconnected')

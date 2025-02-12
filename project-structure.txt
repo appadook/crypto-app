@@ -1,6 +1,0 @@
-
-crypto-app/
-├── frontend/               # Next.js frontend application
-├── backend/               # Flask backend application
-├── .gitignore
-└── README.md

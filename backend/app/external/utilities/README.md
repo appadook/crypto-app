@@ -19,6 +19,9 @@ The output indicates the user where the lowest nominal price is and where the hi
 that the user can take advantage of arbitrage opportunities by buying in one exchange in one fiat currency and selling
 on another exchange in another fiat currency.
 
+### *UI data for front-end
+
+
 
 ## fee_calc.py
 - This module calculates the fees for buying and selling cryptocurrencies on different exchanges.

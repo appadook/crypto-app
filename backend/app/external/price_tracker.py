@@ -5,17 +5,32 @@ from datetime import datetime
 from .price_display import price_display  # Import the price display module
 from app.external.utilities.exchange_spread import ExchangeSpread  # Import the ExchangeSpread class
 from app.external.utilities.csv_tracker import CSVTracker  # Import the CSVTracker class
+from app.external.utilities.client_data_collector import DataCollector  # Import the DataCollector class
+from flask_socketio import SocketIO
+
 
 class PriceTracker:
     def __init__(self):
         self.crypto_prices = {}
+        # Initialize exchange rates for all websocket connections
+        # self.exchange_rates = {
+        #     'EURUSD': None,  # Changed from EUR/USD
+        #     'GBPCHF': None   # Changed from GBP/CHF
+        # }
         self.exchange_rates = {
-            'EURUSD': None,  # Changed from EUR/USD
-            'GBPCHF': None   # Changed from GBP/CHF
+            'USD': 1.0,
+            'EUR': 1.1,  # 1 EUR = 1.1 USD
+            'GBP': 1.3
         }
         self.message_count = 0
         self.logger = logging.getLogger(__name__)
+        # self.socketio = socketio
+
+        # May need to make adjustments with live websocket like behavior with client
         self.csv_tracker = CSVTracker()
+        self.data_collector = DataCollector(self.crypto_prices, self.exchange_rates)
+        self.client_data = None
+        
     
     def initialize_crypto_pairs(self, pairs: list[str]):
         """Initialize cryptocurrency pairs from strategy"""
@@ -65,6 +80,11 @@ class PriceTracker:
             
             self.message_count += 1
             self._update_display()
+
+            self.client_data = self.data_collector.get_arbitrage_data()
+            # Replace the call to emit with self.socketio.emit to avoid needing an active request context
+            # self.socketio.emit('client data', self.client_data, broadcast=True)
+
             # self._update_csv()
             # self._display_arbitrage()
             # self._display_spread_across_exchanges()
@@ -82,19 +102,19 @@ class PriceTracker:
             self.logger.error(f"Inputs - crypto: {crypto}, exchange: {exchange}, fiat: {fiat}, price: {price}, timestamp: {timestamp}")
             self.logger.error("="*40 + "\n")
     
-    def update_exchange_rate(self, pair: str, rate: float, timestamp=None):
-        """Update forex exchange rate."""
-        if timestamp is None:
-            timestamp = datetime.now().isoformat()
+    # def update_exchange_rate(self, pair: str, rate: float, timestamp=None):
+    #     """Update forex exchange rate."""
+    #     if timestamp is None:
+    #         timestamp = datetime.now().isoformat()
         
-        if pair in self.exchange_rates:
-            self.exchange_rates[pair] = {
-                'rate': rate,
-                'timestamp': timestamp
-            }
-            self._update_display()
-        else:
-            self.logger.error(f"Unknown currency pair: {pair}")
+    #     if pair in self.exchange_rates:
+    #         self.exchange_rates[pair] = {
+    #             'rate': rate,
+    #             'timestamp': timestamp
+    #         }
+    #         self._update_display()
+    #     else:
+    #         self.logger.error(f"Unknown currency pair: {pair}")
 
     def _update_display(self):
         """Private method to handle display updates."""
@@ -196,6 +216,9 @@ class PriceTracker:
             'crypto': self.crypto_prices,
             'exchange_rates': self.exchange_rates
         }
+    
+    def get_client_data(self):
+        return self.client_data
     
     def _update_csv(self):
         csv_tracker = self.csv_tracker

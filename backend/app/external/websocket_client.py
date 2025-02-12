@@ -2,6 +2,7 @@ import websockets
 import asyncio
 import logging
 import json
+# from app import socketio
 from app.external.strategies.coinapi_strategy import CoinAPIStrategy
 from app.external.price_tracker import PriceTracker
 from app.external.strategies.exchange_api_strategy import ExchangeAPIStrategy
