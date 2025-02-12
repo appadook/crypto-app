@@ -6,11 +6,13 @@ from .price_display import price_display  # Import the price display module
 from app.external.utilities.exchange_spread import ExchangeSpread  # Import the ExchangeSpread class
 from app.external.utilities.csv_tracker import CSVTracker  # Import the CSVTracker class
 from app.external.utilities.client_data_collector import DataCollector  # Import the DataCollector class
-from flask_socketio import SocketIO
+
 
 
 class PriceTracker:
-    def __init__(self):
+    def __init__(self, socketio):
+        if socketio is None:
+            raise ValueError("A valid SocketIO instance is required!")
         self.crypto_prices = {}
         # Initialize exchange rates for all websocket connections
         # self.exchange_rates = {
@@ -24,7 +26,7 @@ class PriceTracker:
         }
         self.message_count = 0
         self.logger = logging.getLogger(__name__)
-        # self.socketio = socketio
+        self.socketio = socketio
 
         # May need to make adjustments with live websocket like behavior with client
         self.csv_tracker = CSVTracker()
@@ -82,8 +84,11 @@ class PriceTracker:
             self._update_display()
 
             self.client_data = self.data_collector.get_arbitrage_data()
-            # Replace the call to emit with self.socketio.emit to avoid needing an active request context
-            # self.socketio.emit('client data', self.client_data, broadcast=True)
+
+            if self.socketio:
+                self.socketio.emit('client data', self.client_data)
+            else:
+                self.logger.error("SocketIO instance not initialized! Cannot emit client data.")
 
             # self._update_csv()
             # self._display_arbitrage()

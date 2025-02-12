@@ -1,11 +1,11 @@
 # backend/app/routes/routes.py
 from flask import Blueprint, jsonify
-from app.external.price_tracker import PriceTracker
+from app.price_tracker_instance import price_tracker
 from datetime import datetime
 from flask_socketio import emit
+from app.socketio_instance import socketio
 
 main_bp = Blueprint('main', __name__)
-price_tracker = PriceTracker()  # Instantiate the PriceTracker
 
 @main_bp.route('/api/latest-prices', methods=['GET'])
 def get_latest_prices():

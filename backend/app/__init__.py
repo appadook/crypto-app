@@ -1,5 +1,6 @@
 # backend/app/__init__.py
 from flask import Flask
+from .socketio_instance import socketio
 from flask_socketio import SocketIO
 import logging
 from app.config.settings import Config

@@ -2,14 +2,13 @@ import websockets
 import asyncio
 import logging
 import json
-# from app import socketio
+from app.socketio_instance import socketio
 from app.external.strategies.coinapi_strategy import CoinAPIStrategy
-from app.external.price_tracker import PriceTracker
+from app.price_tracker_instance import price_tracker
 from app.external.strategies.exchange_api_strategy import ExchangeAPIStrategy
 # Add more strategy imports as needed
 
 logger = logging.getLogger(__name__)
-price_tracker = PriceTracker()
 
 class WebSocketClient:
     def __init__(self):
