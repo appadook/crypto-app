@@ -2,7 +2,7 @@
 import { io } from 'socket.io-client';
 
 // Replace with your backend URL/port (see [backend/run.py](backend/run.py))
-const socket = io('http://localhost:5000', {
+const socket = io('http://11.23.7.104:5000', {
   transports: ['websocket']
 });
 

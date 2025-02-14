@@ -29,3 +29,8 @@ archive/
 
 # csv files
 *.csv
+
+# macOS
+/.DS_Store
+
+frontend/.bolt/

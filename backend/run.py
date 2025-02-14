@@ -13,6 +13,13 @@ coinapi_strategy = CoinAPIStrategy(price_tracker)  # Instantiate the strategy wi
 def broadcast_update(event, data):
     socketio.emit(event, data)
 
+# Add connect event handler for testing
+@socketio.on("connect")
+def test_connect():
+    print("Client connected")
+    socketio.emit("client data", {"message": "Hello from backend"})
+
+
 if __name__ == '__main__':
     try:
         # Start external WebSocket client in a separate thread
