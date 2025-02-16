@@ -43,12 +43,13 @@ class ExchangeAPIStrategy(WebSocketStrategy):
             # Process regular messages
             result = self.processor.process_message(message)
             if isinstance(result, dict) and 'name' in result and 'ask' in result:
-                pair = self.normalize_pair(result["name"])
+                # The name is already normalized by the processor
+                pair = result["name"]  # No need to normalize again
                 self.logger.info(f"Updating rate for {pair}: {result['ask']}")
                 self.price_tracker.update_exchange_rate(
                     pair,
                     float(result["ask"]),
-                    result.get("time")
+                    result.get("timestamp")
                 )
             
             return result
@@ -58,11 +59,7 @@ class ExchangeAPIStrategy(WebSocketStrategy):
             return None
 
     def get_supported_pairs(self) -> list[str]:
-        return ["EURUSD", "GBPCHF"]
+        return ["EURUSD", "GBPUSD"]
 
     def get_name(self) -> str:
         return "xchangeapi"
-    
-    def normalize_pair(self, pair: str) -> str:
-        """Convert EUR/USD format to EURUSD format"""
-        return pair.replace('/', '')

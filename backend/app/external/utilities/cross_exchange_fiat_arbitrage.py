@@ -27,23 +27,68 @@ class CrossExchangeFiatArbitrage:
         highest_price = float('-inf')
         highest_price_exchange = None
 
+        # Process one crypto at a time
         for crypto, exchanges in self.price_data.items():
+            # Reset for each cryptocurrency
+            crypto_lowest_price = float('inf')
+            crypto_lowest_exchange = None
+            crypto_highest_price = float('-inf')
+            crypto_highest_exchange = None
+
+            # Only process the current cryptocurrency's data
             for exchange, currencies in exchanges.items():
                 for currency, data in currencies.items():
-                    price_in_usd = data['price'] * self.exchange_rates[currency]
-                    if price_in_usd < lowest_price:
-                        lowest_price = price_in_usd
-                        lowest_price_exchange = (crypto, exchange, currency)
-                    if price_in_usd > highest_price:
-                        highest_price = price_in_usd
-                        highest_price_exchange = (crypto, exchange, currency)
+                    # Handle USD as base currency
+                    if currency == 'USD':
+                        rate = 1.0
+                    else:
+                        # Get exchange rate from dictionary structure
+                        exchange_rate_data = self.exchange_rates.get(currency)
+                        if not exchange_rate_data or not isinstance(exchange_rate_data, dict):
+                            continue
+                        
+                        rate = exchange_rate_data.get('rate')
+                        if not rate:
+                            continue
+                    
+                    try:
+                        price_in_usd = float(data['price']) * float(rate)
+                        if price_in_usd < crypto_lowest_price:
+                            crypto_lowest_price = price_in_usd
+                            crypto_lowest_exchange = (crypto, exchange, currency)
+                        if price_in_usd > crypto_highest_price:
+                            crypto_highest_price = price_in_usd
+                            crypto_highest_exchange = (crypto, exchange, currency)
+                    except (ValueError, TypeError):
+                        continue
 
-        return {
-            'lowest_price': lowest_price,
-            'lowest_price_exchange': lowest_price_exchange,
-            'highest_price': highest_price,
-            'highest_price_exchange': highest_price_exchange
-        }
+            # If we found both a lowest and highest price for this crypto
+            if crypto_lowest_exchange and crypto_highest_exchange:
+                # Only update if this crypto has a better spread
+                current_spread = (crypto_highest_price - crypto_lowest_price) / crypto_lowest_price
+                best_spread = (highest_price - lowest_price) / lowest_price if lowest_price != float('inf') else 0
+                
+                if current_spread > best_spread:
+                    lowest_price = crypto_lowest_price
+                    lowest_price_exchange = crypto_lowest_exchange
+                    highest_price = crypto_highest_price
+                    highest_price_exchange = crypto_highest_exchange
+
+        # Return the best arbitrage opportunity found
+        if lowest_price_exchange and highest_price_exchange:
+            return {
+                'lowest_price': lowest_price,
+                'lowest_price_exchange': lowest_price_exchange,
+                'highest_price': highest_price,
+                'highest_price_exchange': highest_price_exchange
+            }
+        else:
+            return {
+                'lowest_price': None,
+                'lowest_price_exchange': None,
+                'highest_price': None,
+                'highest_price_exchange': None
+            }
 
     def display_arbitrage_opportunity(self):
         result = self.find_lowest_and_highest_price()

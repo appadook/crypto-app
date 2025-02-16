@@ -41,4 +41,55 @@ fee_structures = {
             },
         },
     },
+    "bitstamp": {  
+        "trading_fee_buy": 0.0003,  # 0.03% taker fee (VIP tier: $20M+ 30-day volume)  
+        "spread_fee_buy": 0.0,  # No explicit spread fee (dynamic market spread)  
+        "payment_fee": {  
+            "ACH": 0.0,  # Free ACH deposits  
+            "Wire": 0.0,  # Free USD wire deposits  
+            "Credit/Debit Card": 0.05,  # 5% card fee (unchanged for all tiers)  
+        },  
+        "network_fee": 0.0,  # Covered in withdrawal fees  
+        "blockchain_fee": 0.0,  # Covered in withdrawal fees  
+        "trading_fee_sell": 0.0003,  # 0.03% taker fee (VIP tier)  
+        "spread_fee_sell": 0.0,  
+        "withdrawal_fee": {  
+            "crypto": {  
+                "BTC": 0.0005,  # Fixed BTC withdrawal fee (unchanged by tier)  
+                "ETH": 0.005,  # Fixed ETH withdrawal fee  
+            },  
+            "fiat": {  
+                "USD": {"Wire": 0.001},  # 0.1% (min $7.5) for USD wire  
+                "EUR": {"SEPA": 3.0},  # 3.00 EUR for SEPA  
+                "GBP": {"Faster Payments": 2.0},  # £2 fixed (assumed unchanged)  
+            },  
+        },  
+    },  
+    "kraken": {  
+        "trading_fee_buy": 0.0016,  # 0.16% taker fee (highest volume tier: $10M+ 30-day trade volume)  
+        "spread_fee_buy": 0.0,  # No explicit spread fee  
+        "payment_fee": {  
+            "ACH": 0.0,  # Free ACH deposits  
+            "Wire": 0.0,  # Free domestic wire deposits  
+        },  
+        "network_fee": 0.0,  # Covered in withdrawal fees  
+        "blockchain_fee": 0.0,  
+        "trading_fee_sell": 0.0016,  # 0.16% taker fee  
+        "spread_fee_sell": 0.0,  
+        "withdrawal_fee": {  
+            "crypto": {  
+                "BTC": 0.00015,  # Fixed BTC withdrawal fee  
+                "ETH": 0.0015,  # Fixed ETH withdrawal fee  
+            },  
+            "fiat": {  
+                "USD": {"Wire": 5.0},  # $5 USD wire withdrawal  
+                "EUR": {"SEPA": 1.0},  # 1.00 EUR SEPA  
+                "GBP": {"Faster Payments": 0.0},  # Free for GBP (confirmed)  
+            },  
+        },  
+    },
 }
+
+
+
+    

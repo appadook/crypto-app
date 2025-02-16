@@ -39,8 +39,17 @@ class PriceDisplay:
                     if rate_data and isinstance(rate_data, dict):
                         rate = rate_data.get('rate')
                         try:
-                            timestamp = str(rate_data.get('timestamp')) if rate_data.get('timestamp') else datetime.now().isoformat()
-                            rate_time = datetime.fromisoformat(timestamp).strftime('%H:%M:%S')
+                            timestamp = rate_data.get('timestamp')
+                            if timestamp:
+                                # Handle Unix timestamp
+                                if isinstance(timestamp, (int, float)) or (isinstance(timestamp, str) and timestamp.replace('.', '').isdigit()):
+                                    timestamp_float = float(timestamp)
+                                    rate_time = datetime.fromtimestamp(timestamp_float).strftime('%H:%M:%S')
+                                else:
+                                    # Try ISO format
+                                    rate_time = datetime.fromisoformat(str(timestamp)).strftime('%H:%M:%S')
+                            else:
+                                rate_time = datetime.now().strftime('%H:%M:%S')
                             output.append(f"{pair}: {rate:.4f} ({rate_time})")
                         except Exception as e:
                             self.logger.error(f"Timestamp error for {pair}: {e}")

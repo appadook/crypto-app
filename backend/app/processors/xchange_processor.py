@@ -20,20 +20,31 @@ class XChangeProcessor(DataProcessor):
     def unpack_err_pair(self, data):
         return json.loads(data)
     
+    def normalize_pair(self, pair: str) -> str:
+        """
+        Convert 'EURUSD' format to 'EUR' since we're always working relative to USD
+        """
+        if pair.endswith('USD'):
+            return pair[:-3]  # Remove 'USD' suffix
+        return pair
+    
     def unpack_data(self, data):
         inc = data.split('|')
         out = {}
         for i, key in enumerate(self.order):
             out[key] = inc[i]
-        out["name"] = self.normalize_pair(self.mapping[out["name"]])  # Add normalization
+        out["name"] = self.mapping[out["name"]]
         out["time"] = float(out["time"]) / self.time_mult + self.start_time
         
-        # Store latest data
+        # Normalize the currency pair name and store latest data
         if 'name' in out and 'ask' in out:
-            self.latest_data[out['name']] = {
+            normalized_name = self.normalize_pair(out['name'])
+            self.latest_data[normalized_name] = {
                 'rate': float(out['ask']),
                 'timestamp': out['time']
             }
+            # Update the name in the output to match the normalized format
+            out['name'] = normalized_name
         return out
     
     def process_message(self, data):
@@ -46,7 +57,15 @@ class XChangeProcessor(DataProcessor):
             elif t in ['7', '8', '9']:
                 return self.unpack_err_pair(msg)
             elif t == '1':
-                return self.unpack_data(msg)
+                processed_data = self.unpack_data(msg)
+                if processed_data and 'name' in processed_data and 'ask' in processed_data:
+                    # Return data in the format expected by price_tracker
+                    return {
+                        'name': processed_data['name'],
+                        'ask': float(processed_data['ask']),
+                        'timestamp': processed_data['time']
+                    }
+                return processed_data
             elif t == '2':
                 return "heartbeat"
             else:
@@ -54,14 +73,17 @@ class XChangeProcessor(DataProcessor):
         except Exception as e:
             print(f"Error processing message: {e}")
             return None
-        
     
     def get_latest_data(self) -> dict:
         """Implement abstract method from DataProcessor"""
         return self.latest_data
     
-    def normalize_pair(self, pair: str) -> str:
-        """Convert EURUSD format to EUR/USD format"""
-        if len(pair) == 6:  # EURUSD format
-            return f"{pair[:3]}/{pair[3:]}"
-        return pair
+    # def normalize_pair(self, pair: str) -> str:
+    #     """
+    #     Convert 'EUR/USD' format to 'EUR' if the second symbol is 'USD';
+    #     otherwise, remove the slash.
+    #     """
+    #     parts = pair.split('/')
+    #     if len(parts) == 2 and parts[1].upper() == 'USD':
+    #         return parts[0]
+    #     return pair.replace('/', '')

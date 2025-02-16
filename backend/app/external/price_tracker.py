@@ -15,14 +15,11 @@ class PriceTracker:
             raise ValueError("A valid SocketIO instance is required!")
         self.crypto_prices = {}
         # Initialize exchange rates for all websocket connections
-        # self.exchange_rates = {
-        #     'EURUSD': None,  # Changed from EUR/USD
-        #     'GBPCHF': None   # Changed from GBP/CHF
-        # }
+        current_time = datetime.now().isoformat()
         self.exchange_rates = {
-            'USD': 1.0,
-            'EUR': 1.1,  # 1 EUR = 1.1 USD
-            'GBP': 1.3
+            'USD': {'rate': 1.0, 'timestamp': current_time},
+            'GBP': {'rate': None, 'timestamp': current_time},
+            'EUR': {'rate': None, 'timestamp': current_time}
         }
         self.message_count = 0
         self.logger = logging.getLogger(__name__)
@@ -54,6 +51,7 @@ class PriceTracker:
         try:
             # Debug current state
             print(f"Before update - crypto_prices: {self.crypto_prices}")
+            print(f"Before update - exchange_rates: {self.exchange_rates}")
             
             # Validate inputs
             if not all([crypto, exchange, price, timestamp, fiat]):
@@ -82,17 +80,18 @@ class PriceTracker:
             
             self.message_count += 1
             self._update_display()
+            self.csv_tracker.write_spread_strategy(self.crypto_prices)
+            self.csv_tracker.write_fiat_arbitrage(self.crypto_prices, self.exchange_rates)
+            self.csv_tracker.write_cross_exchange_fiat_arbitrage(self.crypto_prices, self.exchange_rates)
 
-            self.client_data = self.data_collector.get_arbitrage_data()
 
-            if self.socketio:
-                self.socketio.emit('client data', self.client_data)
-            else:
-                self.logger.error("SocketIO instance not initialized! Cannot emit client data.")
+            # self.client_data = self.data_collector.get_arbitrage_data()
 
-            # self._update_csv()
-            # self._display_arbitrage()
-            # self._display_spread_across_exchanges()
+            # if self.socketio:
+            #     self.socketio.emit('client data', self.client_data)
+            # else:
+            #     self.logger.error("SocketIO instance not initialized! Cannot emit client data.")
+
 
         except TypeError as e:
             self.logger.error("\n" + "="*40)
@@ -107,19 +106,19 @@ class PriceTracker:
             self.logger.error(f"Inputs - crypto: {crypto}, exchange: {exchange}, fiat: {fiat}, price: {price}, timestamp: {timestamp}")
             self.logger.error("="*40 + "\n")
     
-    # def update_exchange_rate(self, pair: str, rate: float, timestamp=None):
-    #     """Update forex exchange rate."""
-    #     if timestamp is None:
-    #         timestamp = datetime.now().isoformat()
+    def update_exchange_rate(self, pair: str, rate: float, timestamp=None):
+        """Update forex exchange rate."""
+        if timestamp is None:
+            timestamp = datetime.now().isoformat()
         
-    #     if pair in self.exchange_rates:
-    #         self.exchange_rates[pair] = {
-    #             'rate': rate,
-    #             'timestamp': timestamp
-    #         }
-    #         self._update_display()
-    #     else:
-    #         self.logger.error(f"Unknown currency pair: {pair}")
+        if pair in self.exchange_rates:
+            self.exchange_rates[pair] = {
+                'rate': rate,
+                'timestamp': timestamp
+            }
+            self._update_display()
+        else:
+            self.logger.error(f"Unknown currency pair: {pair}")
 
     def _update_display(self):
         """Private method to handle display updates."""
@@ -149,13 +148,13 @@ class PriceTracker:
         except Exception as e:
             self.logger.error("Display update error: %s", str(e))
 
-    def _update_csv(self):
-        """Private method to handle CSV updates."""
-        try:
-            csv_tracker = CSVTracker()
-            csv_tracker.store_price_data(self.crypto_prices)
-        except Exception as e:
-            self.logger.error("CSV update error: %s", str(e))
+    # def _update_csv(self):
+    #     """Private method to handle CSV updates."""
+    #     try:
+    #         csv_tracker = CSVTracker()
+    #         csv_tracker.store_price_data(self.crypto_prices)
+    #     except Exception as e:
+    #         self.logger.error("CSV update error: %s", str(e))
 
     def process_trade_message(self, data):
         try:

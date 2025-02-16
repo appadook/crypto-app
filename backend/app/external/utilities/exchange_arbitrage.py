@@ -26,13 +26,30 @@ class ExchangeArbitrage:
         for crypto, exchanges in self.price_data.items():
             for exchange, currencies in exchanges.items():
                 for currency, data in currencies.items():
-                    price_in_usd = data['price'] * self.exchange_rates[currency]
-                    if price_in_usd < lowest_price:
-                        lowest_price = price_in_usd
-                        lowest_price_exchange = (crypto, exchange, currency)
-                    if price_in_usd > highest_price:
-                        highest_price = price_in_usd
-                        highest_price_exchange = (crypto, exchange, currency)
+                    # Handle USD as base currency
+                    if currency == 'USD':
+                        rate = 1.0
+                    else:
+                        # Get exchange rate from dictionary structure
+                        exchange_rate_data = self.exchange_rates.get(currency)
+                        if not exchange_rate_data or not isinstance(exchange_rate_data, dict):
+                            continue
+                        
+                        rate = exchange_rate_data.get('rate')
+                        if not rate:
+                            continue
+                    
+                    try:
+                        price_in_usd = float(data['price']) * float(rate)
+                        if price_in_usd < lowest_price:
+                            lowest_price = price_in_usd
+                            lowest_price_exchange = (crypto, exchange, currency)
+                        if price_in_usd > highest_price:
+                            highest_price = price_in_usd
+                            highest_price_exchange = (crypto, exchange, currency)
+                    except (ValueError, TypeError):
+                        continue  # Skip if we can't convert to float
+
         return {
             'lowest_price': lowest_price,
             'lowest_price_exchange': lowest_price_exchange,
