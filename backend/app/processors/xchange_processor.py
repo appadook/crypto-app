@@ -78,12 +78,4 @@ class XChangeProcessor(DataProcessor):
         """Implement abstract method from DataProcessor"""
         return self.latest_data
     
-    # def normalize_pair(self, pair: str) -> str:
-    #     """
-    #     Convert 'EUR/USD' format to 'EUR' if the second symbol is 'USD';
-    #     otherwise, remove the slash.
-    #     """
-    #     parts = pair.split('/')
-    #     if len(parts) == 2 and parts[1].upper() == 'USD':
-    #         return parts[0]
-    #     return pair.replace('/', '')
+ 

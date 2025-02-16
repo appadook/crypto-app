@@ -2,7 +2,6 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
-# from fee_calc import FeeCalc
 from app.external.utilities.fee_calc import FeeCalculator
 from app.external.utilities.exchange_spread import ExchangeSpread
 from app.external.utilities.exchange_arbitrage import ExchangeArbitrage
@@ -16,8 +15,7 @@ from app.external.utilities.cross_exchange_fiat_arbitrage import CrossExchangeFi
 
 
 class CSVTracker:
-    def __init__(self):
-        pass
+    
 
     def write_spread_strategy(self, price_data):
         """
@@ -340,7 +338,6 @@ if __name__ == '__main__':
     }
 
     csv_tracker = CSVTracker()
-    # csv_tracker.store_price_data(price_data)
-    # csv_tracker.write_fiat_arbitrage(price_data, exchange_rates)
-    # csv_tracker.write_spread_strategy(price_data=price_data)
+    csv_tracker.write_fiat_arbitrage(price_data, exchange_rates)
+    csv_tracker.write_spread_strategy(price_data=price_data)
     csv_tracker.write_cross_exchange_fiat_arbitrage(price_data, exchange_rates)

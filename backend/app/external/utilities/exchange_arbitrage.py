@@ -65,43 +65,46 @@ class ExchangeArbitrage:
     
 # Example usage
 if __name__ == "__main__":
+    # Example timestamp
+    EXAMPLE_TIMESTAMP = '2023-10-01T00:00:00Z'
+    
     # Example price data
     price_data: PriceDataType = {
         'BTC': {
             'COINBASE': {
-                'USD': {'price': 50000.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'EUR': {'price': 45000.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'GBP': {'price': 40000.0, 'timestamp': '2023-10-01T00:00:00Z'}
+                'USD': {'price': 50000.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'EUR': {'price': 45000.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'GBP': {'price': 40000.0, 'timestamp': EXAMPLE_TIMESTAMP}
             },
             'BINANCE': {
-                'USD': {'price': 50500.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'EUR': {'price': 45500.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'GBP': {'price': 40500.0, 'timestamp': '2023-10-01T00:00:00Z'}
+                'USD': {'price': 50500.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'EUR': {'price': 45500.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'GBP': {'price': 40500.0, 'timestamp': EXAMPLE_TIMESTAMP}
             },
             'KRAKEN': {
-                'USD': {'price': 50200.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'EUR': {'price': 45200.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'GBP': {'price': 40200.0, 'timestamp': '2023-10-01T00:00:00Z'}
+                'USD': {'price': 50200.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'EUR': {'price': 45200.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'GBP': {'price': 40200.0, 'timestamp': EXAMPLE_TIMESTAMP}
             },
             'GEMINI': {
-                'USD': {'price': 50100.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'EUR': {'price': 45100.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'GBP': {'price': 40100.0, 'timestamp': '2023-10-01T00:00:00Z'}
+                'USD': {'price': 50100.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'EUR': {'price': 45100.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'GBP': {'price': 40100.0, 'timestamp': EXAMPLE_TIMESTAMP}
             },
             'BITSTAMP': {
-                'USD': {'price': 50300.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'EUR': {'price': 45300.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'GBP': {'price': 40300.0, 'timestamp': '2023-10-01T00:00:00Z'}
+                'USD': {'price': 50300.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'EUR': {'price': 45300.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'GBP': {'price': 40300.0, 'timestamp': EXAMPLE_TIMESTAMP}
             },
             'HUOBI': {
-                'USD': {'price': 50400.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'EUR': {'price': 45400.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'GBP': {'price': 40400.0, 'timestamp': '2023-10-01T00:00:00Z'}
+                'USD': {'price': 50400.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'EUR': {'price': 45400.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'GBP': {'price': 40400.0, 'timestamp': EXAMPLE_TIMESTAMP}
             },
             'OKEX': {
-                'USD': {'price': 50600.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'EUR': {'price': 45600.0, 'timestamp': '2023-10-01T00:00:00Z'},
-                'GBP': {'price': 40600.0, 'timestamp': '2023-10-01T00:00:00Z'}
+                'USD': {'price': 50600.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'EUR': {'price': 45600.0, 'timestamp': EXAMPLE_TIMESTAMP},
+                'GBP': {'price': 40600.0, 'timestamp': EXAMPLE_TIMESTAMP}
             }
         }
     }

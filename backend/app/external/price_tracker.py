@@ -148,13 +148,6 @@ class PriceTracker:
         except Exception as e:
             self.logger.error("Display update error: %s", str(e))
 
-    # def _update_csv(self):
-    #     """Private method to handle CSV updates."""
-    #     try:
-    #         csv_tracker = CSVTracker()
-    #         csv_tracker.store_price_data(self.crypto_prices)
-    #     except Exception as e:
-    #         self.logger.error("CSV update error: %s", str(e))
 
     def process_trade_message(self, data):
         try:

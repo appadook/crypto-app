@@ -1,3 +1,5 @@
+FASTER_PAYMENTS = "Faster Payments"
+
 fee_structures = {
     "coinbase": {
         "trading_fee_buy": 0.0,  # 0% for Coinbase One
@@ -16,7 +18,7 @@ fee_structures = {
             "fiat": {
                 "USD": {"ACH": 0.0, "Wire": 10.0},  # ACH is free, Wire is $10
                 "EUR": {"SEPA": 0.15},  # 0.15 EUR for SEPA
-                "GBP": {"Faster Payments": 0.0},  # Free for Faster Payments
+                "GBP": {FASTER_PAYMENTS: 0.0},  # Free for Faster Payments
             },
         },
     },
@@ -37,7 +39,7 @@ fee_structures = {
             "fiat": {
                 "USD": {"SWIFT": 15.0},  # $15–$30 for SWIFT
                 "EUR": {"SEPA": 1.0},  # 1 EUR for SEPA
-                "GBP": {"Faster Payments": 1.0},  # 1 GBP for Faster Payments
+                "GBP": {FASTER_PAYMENTS: 1.0},  # 1 GBP for Faster Payments
             },
         },
     },
@@ -61,7 +63,7 @@ fee_structures = {
             "fiat": {  
                 "USD": {"Wire": 0.001},  # 0.1% (min $7.5) for USD wire  
                 "EUR": {"SEPA": 3.0},  # 3.00 EUR for SEPA  
-                "GBP": {"Faster Payments": 2.0},  # £2 fixed (assumed unchanged)  
+                "GBP": {FASTER_PAYMENTS: 2.0},  # £2 fixed (assumed unchanged)  
             },  
         },  
     },  
@@ -84,7 +86,7 @@ fee_structures = {
             "fiat": {  
                 "USD": {"Wire": 5.0},  # $5 USD wire withdrawal  
                 "EUR": {"SEPA": 1.0},  # 1.00 EUR SEPA  
-                "GBP": {"Faster Payments": 0.0},  # Free for GBP (confirmed)  
+                "GBP": {FASTER_PAYMENTS: 0.0},  # Free for GBP (confirmed)  
             },  
         },  
     },

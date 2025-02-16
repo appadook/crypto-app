@@ -109,6 +109,6 @@ if __name__ == "__main__":
 
     spread_tracker = ExchangeSpread()
     spread_tracker.update_spreads(price_data)
-    # print("Highest Prices:", spread_tracker.get_highest_prices())
-    # print("Lowest Prices:", spread_tracker.get_lowest_prices())
+    print("Highest Prices:", spread_tracker.get_highest_prices())
+    print("Lowest Prices:", spread_tracker.get_lowest_prices())
     spread_tracker.display_spread()
