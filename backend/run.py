@@ -9,8 +9,6 @@ from app.price_tracker_instance import price_tracker
 app = create_app()
 socketio.init_app(app)  
 
-# coinapi_strategy = CoinAPIStrategy(price_tracker)  # Instantiate the strategy with the price tracker
-# xchangeapi_strategy = ExchangeAPIStrategy(price_tracker)  # Instantiate the strategy with the price tracker
 
 def broadcast_update(event, data):
     socketio.emit(event, data)
