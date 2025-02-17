@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import useWebSocket from '@/hooks/useWebSocket';
 
-export default function NewTabScreen() {
+export default function LiveArbitrageScreen() {
   const { arbitrageData, helloMessage, connectionStatus, lastUpdate, isDataFresh } = useWebSocket();
   const [lastHelloMessage, setLastHelloMessage] = useState<string | null>(null);
 
@@ -32,6 +32,8 @@ export default function NewTabScreen() {
       maximumFractionDigits: 2
     }).format(value);
   };
+
+  const profitColor = arbitrageData && typeof arbitrageData.arbitrage_after_fees === 'number' && arbitrageData.arbitrage_after_fees > 0 ? '#00ff00' : '#ff4c4c';
 
   const renderArbitrageContent = () => {
     if (!connectionStatus.isConnected) {
@@ -103,9 +105,7 @@ export default function NewTabScreen() {
 
         <View style={styles.profitSection}>
           <Text style={styles.feesText}>Total Fees: {formatCurrency(arbitrageData.total_fees || 0)}</Text>
-          <Text style={styles.profitText}>
-            Profit after Fees: {formatCurrency(arbitrageData.arbitrage_after_fees || 0)}
-          </Text>
+          <Text style={[styles.profitText, { color: profitColor }]}>Profit after Fees: {formatCurrency(arbitrageData.arbitrage_after_fees || 0)}</Text>
         </View>
       </View>
     );
@@ -164,25 +164,25 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#000000',
   },
   statusBar: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 16,
+    padding: 8,
+    backgroundColor: '#1c1c1c',
+    borderRadius: 8,
+    elevation: 2,
+    shadowColor: '#fff',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   statusContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 8,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    elevation: 2,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
   statusIndicator: {
     width: 12,
@@ -193,39 +193,40 @@ const styles = StyleSheet.create({
   statusText: {
     fontSize: 16,
     fontWeight: '600',
+    color: '#ffffff',
   },
   lastUpdateText: {
     fontSize: 12,
-    color: '#666',
+    color: '#cccccc',
   },
   errorText: {
-    color: '#F44336',
+    color: '#ff4c4c',
     marginBottom: 16,
     padding: 8,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: '#330000',
     borderRadius: 4,
   },
   helloContainer: {
     padding: 16,
     marginBottom: 16,
-    backgroundColor: '#E8F5E9',
+    backgroundColor: '#003300',
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
+    borderLeftColor: '#00ff00',
   },
   helloText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#00ff00',
     marginBottom: 8,
   },
   helloTimestamp: {
     fontSize: 12,
-    color: '#666',
+    color: '#999999',
   },
   scrollView: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#1c1c1c',
     borderRadius: 8,
     padding: 8,
   },
@@ -239,50 +240,52 @@ const styles = StyleSheet.create({
   waitingText: {
     marginTop: 12,
     fontSize: 16,
-    color: '#666',
+    color: '#cccccc',
   },
   messageContainer: {
     padding: 16,
     marginBottom: 16,
-    backgroundColor: '#E3F2FD',
+    backgroundColor: '#002244',
     borderRadius: 8,
     borderLeftWidth: 4,
-    borderLeftColor: '#2196F3',
+    borderLeftColor: '#0044ff',
   },
   messageText: {
     fontSize: 16,
-    color: '#1976D2',
+    color: '#66aaff',
   },
   errorContainer: {
-    backgroundColor: '#FFEBEE',
-    borderLeftColor: '#F44336',
+    backgroundColor: '#330000',
+    borderLeftColor: '#ff4c4c',
   },
   warningContainer: {
-    backgroundColor: '#FFF3E0',
-    borderLeftColor: '#FF9800',
+    backgroundColor: '#332200',
+    borderLeftColor: '#ffaa00',
   },
   warningText: {
     fontSize: 16,
-    color: '#F57C00',
+    color: '#ffaa00',
   },
   arbitrageContainer: {
     padding: 16,
-    backgroundColor: '#E8F5E9',
+    backgroundColor: '#1c1c1c',
     borderRadius: 8,
-    borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
+    marginBottom: 16,
+    shadowColor: '#fff',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   arbitrageTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#ffffff',
     marginBottom: 8,
   },
   cryptoName: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1976D2',
-    marginBottom: 16,
+    fontSize: 18,
+    color: '#cccccc',
+    marginBottom: 8,
   },
   opportunityContainer: {
     flexDirection: 'row',
@@ -291,61 +294,59 @@ const styles = StyleSheet.create({
   },
   buySection: {
     flex: 1,
-    padding: 12,
-    backgroundColor: '#E3F2FD',
+    padding: 8,
+    backgroundColor: '#003300',
     borderRadius: 8,
     marginRight: 8,
   },
   sellSection: {
     flex: 1,
-    padding: 12,
-    backgroundColor: '#E8EAF6',
+    padding: 8,
+    backgroundColor: '#330000',
     borderRadius: 8,
     marginLeft: 8,
   },
   sectionTitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#666',
+    color: '#ffffff',
     marginBottom: 4,
   },
   exchangeName: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1976D2',
+    fontSize: 14,
+    color: '#aaaaaa',
     marginBottom: 4,
   },
   price: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#2E7D32',
-    marginBottom: 4,
+    color: '#ffffff',
   },
   currency: {
     fontSize: 14,
-    color: '#666',
+    color: '#999999',
   },
   profitSection: {
-    padding: 12,
-    backgroundColor: '#F5F5F5',
+    padding: 8,
+    backgroundColor: '#332200',
     borderRadius: 8,
   },
   feesText: {
     fontSize: 14,
-    color: '#666',
+    color: '#ffaa00',
     marginBottom: 4,
   },
   profitText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: '#00ff00',
   },
   staleDataText: {
-    color: '#FFA000',
+    color: '#ffaa00',
     marginLeft: 8,
     fontSize: 14,
   },
   staleLastUpdateText: {
-    color: '#FFA000',
+    color: '#ffaa00',
   },
 });
