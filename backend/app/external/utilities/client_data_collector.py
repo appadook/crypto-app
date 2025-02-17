@@ -25,40 +25,62 @@ class DataCollector:
     
     def get_arbitrage_data(self):
         """Get the arbitrage data from the cross exchange arbitrage class"""
-        arbitrage_data = self.cross_exchange_arbitrage.find_lowest_and_highest_price()
-        lowest_price = arbitrage_data['lowest_price']
-        lowest_price_exchange = arbitrage_data['lowest_price_exchange'][1].lower()
-        highest_price = arbitrage_data['highest_price']
-        highest_price_exchange = arbitrage_data['highest_price_exchange'][1].lower()
-        crypto = arbitrage_data['lowest_price_exchange'][0]
-        buy_currency = arbitrage_data['lowest_price_exchange'][2]
-        sell_currency = arbitrage_data['highest_price_exchange'][2]
-        # fee_calculator = FeeCalculator(
-        #     exchange_buy=lowest_price_exchange,
-        #     exchange_sell=highest_price_exchange,
-        #     crypto=crypto,
-        #     crypto_amount=1,
-        #     crypto_price_buy=lowest_price,
-        #     crypto_price_sell=highest_price,
-        #     currency_withdrawal="USD",
-        #     withdrawal_method="SWIFT"
-        # )
-        # # Calculate fees
-        # fees = fee_calculator.calculate_fees()
-        # total_fees = fees['total_fees']
-        # arbitrage = fees['price arbitrage']
-        # return {    
-        #     'lowest_price': round(lowest_price, 2),
-        #     'lowest_price_exchange': lowest_price_exchange,
-        #     'highest_price': round(highest_price, 2),
-        #     'highest_price_exchange': highest_price_exchange,
-        #     'crypto': crypto,
-        #     'buy_currency': buy_currency,
-        #     'sell_currency': sell_currency,
-        #     'total_fees': round(total_fees, 2),
-        #     'arbitrage': round(arbitrage, 2),
-        #     'profit': f"${round(arbitrage - total_fees, 2)}"
-        # }
+        try:
+            # Validate that we have sufficient data
+            if not self.price_data or not self.exchange_rates:
+                return {
+                    'status': 'waiting',
+                    'message': 'Waiting for price data and exchange rates...'
+                }
+
+            arbitrage_data = self.cross_exchange_arbitrage.find_lowest_and_highest_price()
+            if not arbitrage_data or not arbitrage_data.get('lowest_price_exchange'):
+                return {
+                    'status': 'no_arbitrage',
+                    'message': 'No valid arbitrage opportunities found'
+                }
+
+            lowest_price = arbitrage_data['lowest_price']
+            lowest_price_exchange = arbitrage_data['lowest_price_exchange'][1].lower()
+            highest_price = arbitrage_data['highest_price']
+            highest_price_exchange = arbitrage_data['highest_price_exchange'][1].lower()
+            crypto = arbitrage_data['lowest_price_exchange'][0]
+            buy_currency = arbitrage_data['lowest_price_exchange'][2]
+            sell_currency = arbitrage_data['highest_price_exchange'][2]
+
+            # Initialize fee calculator with correct parameters
+            fee_calculator = FeeCalculator(
+                exchange_buy=lowest_price_exchange,
+                exchange_sell=highest_price_exchange,
+                crypto=crypto,
+                crypto_amount=1,
+                crypto_price_buy=lowest_price,
+                crypto_price_sell=highest_price,
+                currency_withdrawal=sell_currency,
+                exchange_rates=self.exchange_rates
+            )
+
+            # Calculate fees
+            fees = fee_calculator.calculate_fees()
+            
+            return {    
+                'status': 'success',
+                'lowest_price': round(lowest_price, 2),
+                'lowest_price_exchange': lowest_price_exchange,
+                'highest_price': round(highest_price, 2),
+                'highest_price_exchange': highest_price_exchange,
+                'crypto': crypto,
+                'buy_currency': buy_currency,
+                'sell_currency': sell_currency,
+                'total_fees': round(fees['total_fees'], 2),
+                'arbitrage_after_fees': round(fees['arbitrage_after_fees'], 2)
+            }
+        except Exception as e:
+            print(f"Error in get_arbitrage_data: {str(e)}")
+            return {
+                'status': 'error',
+                'message': f'Error calculating arbitrage: {str(e)}'
+            }
     
 # Example usage
 if __name__ == "__main__":
@@ -105,9 +127,9 @@ if __name__ == "__main__":
 
     # Example exchange rates
     exchange_rates = {
-        'USD': 1.0,
-        'EUR': 1.1,  # 1 EUR = 1.1 USD
-        'GBP': 1.3   # 1 GBP = 1.3 USD
+        'USD': {'rate': 1.0, 'timestamp': '2023-10-01T00:00:00Z'},
+        'EUR': {'rate': 1.1, 'timestamp': '2023-10-01T00:00:00Z'},  # 1 EUR = 1.1 USD
+        'GBP': {'rate': 1.3, 'timestamp': '2023-10-01T00:00:00Z'}   # 1 GBP = 1.3 USD
     }
     data_collector = DataCollector(price_data, exchange_rates)
     arbitrage_data = data_collector.get_arbitrage_data()

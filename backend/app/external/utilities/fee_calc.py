@@ -42,7 +42,7 @@ class FeeCalculator:
         withdrawal_method = next(iter(fiat_methods))  # Get the first method
         fiat_fee = fiat_methods[withdrawal_method]
 
-        rate = self.exchange_rates[currency_withdrawal]['rate'] if isinstance(self.exchange_rates[currency_withdrawal], dict) else self.exchange_rates[currency_withdrawal]
+        rate = self.exchange_rates[currency_withdrawal]['rate'] if isinstance(self.exchange_rates[currency_withdrawal], dict) else self.exchange_rates[currency_withdrawal]['rate']
         
         # Normalize the fiat fee to USD using the exchange rate
         return fiat_fee * rate
@@ -93,10 +93,11 @@ class FeeCalculator:
 
 
 if __name__ == "__main__":
+    EXAMPLE_TIMESTAMP = '2023-10-01T00:00:00Z'
     exchange_rates = {
-        'EUR': 1.0492,
-        'GBP': 1.2587,
-        'USD': 1.0000
+        'USD': {'rate': 1.0, 'timestamp': EXAMPLE_TIMESTAMP},
+        'EUR': {'rate': 1.1, 'timestamp': EXAMPLE_TIMESTAMP},  # 1 EUR = 1.1 USD
+        'GBP': {'rate': 1.3, 'timestamp': EXAMPLE_TIMESTAMP}   # 1 GBP = 1.3 USD
     }
     # Example usage
     fee_calculator = FeeCalculator(

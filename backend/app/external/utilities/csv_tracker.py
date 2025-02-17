@@ -138,7 +138,7 @@ class CSVTracker:
                         single_exchange_data = {crypto: {exchange: fiats}}
                         
                         arbitrage_calc = ExchangeArbitrage(single_exchange_data, exchange_rates)
-                        arb_result = arbitrage_calc.find_lowest_and_highest_nominal_price()
+                        arb_result = arbitrage_calc.find_lowest_and_highest_price()
                         
                         # Calculate arbitrage percentage
                         arbitrage_percentage = ((arb_result['highest_price'] - arb_result['lowest_price']) / 
@@ -255,11 +255,12 @@ class CSVTracker:
                             row['arbitrage_after_fees'] = f"${fees['arbitrage_after_fees']:.2f}"
                             writer.writerow(row)
                         except Exception as e:
-                            print(f"DEBUG: Error calculating fees or writing row: {str(e)}")
-                    else:
-                        print(f"DEBUG: No valid arbitrage found for {crypto} or results are for different crypto")
-                else:
-                    print("DEBUG: Validation failed - not enough exchanges or price points")
+                            # print(f"DEBUG: Error calculating fees or writing row: {str(e)}")
+                            continue
+                #     else:
+                #         print(f"DEBUG: No valid arbitrage found for {crypto} or results are for different crypto")
+                # else:
+                #     print("DEBUG: Validation failed - not enough exchanges or price points")
 
     def get_arbitrage_strategy(self):
         """
@@ -269,7 +270,7 @@ class CSVTracker:
             keys: lowest_price, lowest_price_exchange, highest_price, highest_price_exchange
         """
         cross_exchange_arbitrage = CrossExchangeFiatArbitrage(self.price_data, self.exchange_rates)
-        arbitrage_data = cross_exchange_arbitrage.calculate_arbitrage()
+        arbitrage_data = cross_exchange_arbitrage.find_lowest_and_highest_price()
         return arbitrage_data
     
     def store_price_data(self, price_data: PriceData):
