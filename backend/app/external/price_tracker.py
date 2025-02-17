@@ -239,24 +239,24 @@ class PriceTracker:
                 }
             else:
                 # Get arbitrage data from collector
-                # self.client_data = self.data_collector.get_arbitrage_data()
+                self.client_data = self.data_collector.get_arbitrage_data()
 
                 # Generate a random number between 10000 and 10500
-                random_price = random.randint(10000, 10500)  # {{ edit_1 }}
+                # random_price = random.randint(10000, 10500)  # {{ edit_1 }}
 
                 # For testing purposes, use the following data
-                self.client_data = {
-                    'status': 'success',
-                    'crypto': 'BTC',
-                    'lowest_price_exchange': 'BINANCE',
-                    'lowest_price': 10000,
-                    'highest_price_exchange': 'COINBASE',
-                    'highest_price': random_price,
-                    'buy_currency': 'USD',
-                    'sell_currency': 'USD',
-                    'total_fees': 0.01,
-                    'arbitrage_after_fees': random_price - 10000 - 0.01
-                }
+                # self.client_data = {
+                #     'status': 'success',
+                #     'crypto': 'BTC',
+                #     'lowest_price_exchange': 'BINANCE',
+                #     'lowest_price': 10000,
+                #     'highest_price_exchange': 'COINBASE',
+                #     'highest_price': random_price,
+                #     'buy_currency': 'USD',
+                #     'sell_currency': 'USD',
+                #     'total_fees': 0.01,
+                #     'arbitrage_after_fees': random_price - 10000 - 0.01
+                # }
             
             # Prepare data for frontend
             frontend_data = {

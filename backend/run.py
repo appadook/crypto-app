@@ -1,14 +1,12 @@
 # backend/run.py
+from gevent import monkey
+monkey.patch_all()  # This needs to be at the very top!
 from flask import Flask, request
 from flask_socketio import SocketIO
 from flask_cors import CORS
-from gevent import monkey
-monkey.patch_all()  # This needs to be at the very top!
-
 import logging
 from datetime import datetime
-import sys
-import traceback
+from app.external.websocket_client import start_external_websockets, stop_external_websockets
 
 # Configure logging with more detail
 logging.basicConfig(
@@ -79,6 +77,10 @@ if __name__ == '__main__':
         logger.info("CORS enabled for all origins (*)")
         logger.info("WebSocket and polling transports enabled")
         
+        # Start external WebSocket connections
+        logger.info("Starting external WebSocket connections...")
+        start_external_websockets(broadcast_update)
+        
         socketio.run(
             app,
             host='0.0.0.0',
@@ -86,8 +88,12 @@ if __name__ == '__main__':
             debug=True,
             use_reloader=False
         )
+    except KeyboardInterrupt:
+        logger.info("Keyboard interrupt received. Shutting down...")
+        stop_external_websockets()
     except Exception as e:
         logger.error("="*50)
         logger.error("Failed to start server:")
         logger.error(str(e))
+        stop_external_websockets()  # Ensure we stop websockets even on error
         raise
