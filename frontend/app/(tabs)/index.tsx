@@ -77,7 +77,7 @@ export default function ArbitrageScreen() {
 
   useEffect(() => {
     fetchArbitrageOpportunities();
-    const interval = setInterval(fetchArbitrageOpportunities, 30000);
+    const interval = setInterval(fetchArbitrageOpportunities, 3000);
     return () => clearInterval(interval);
   }, []);
 

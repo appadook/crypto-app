@@ -1,42 +1,138 @@
-import { useEffect, useState } from 'react';
-import socket from '@/utilities/socketConnection';
+import { useEffect, useState, useCallback } from 'react';
+import { io, Socket } from 'socket.io-client';
+
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
+
+interface ArbitrageData {
+    status: 'success' | 'waiting' | 'no_arbitrage' | 'error';
+    message?: string;
+    crypto?: string;
+    lowest_price?: number;
+    lowest_price_exchange?: string;
+    highest_price?: number;
+    highest_price_exchange?: string;
+    buy_currency?: string;
+    sell_currency?: string;
+    total_fees?: number;
+    arbitrage_after_fees?: number;
+}
+
+interface HelloMessage {
+    message: string;
+    timestamp: string;
+}
+
+interface ConnectionStatus {
+    isConnected: boolean;
+    lastError: string | null;
+}
 
 const useWebSocket = () => {
-    const [message, setMessage] = useState(null);
-    const [connectionStatus, setConnectionStatus] = useState({ isConnected: false, lastError: null });
+    // State
+    const [socket, setSocket] = useState<Socket | null>(null);
+    const [arbitrageData, setArbitrageData] = useState<ArbitrageData | null>(null);
+    const [helloMessage, setHelloMessage] = useState<HelloMessage | null>(null);
+    const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>({ 
+        isConnected: false, 
+        lastError: null 
+    });
+    const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
+    // Initialize socket connection
     useEffect(() => {
-        // Update connection status
-        setConnectionStatus({ isConnected: socket.connected, lastError: null });
-        // Listen for messages from the server
-        socket.on('client data', (data) => {
-            setMessage(data);
-        });
-
-        // Update connection status on connect and disconnect
-        socket.on('connect', () => {
-            setConnectionStatus({ isConnected: true, lastError: null });
-        });
+        console.log('[WebSocket] Initializing connection to:', BACKEND_URL);
         
-        socket.on('disconnect', () => {
-            setConnectionStatus({ isConnected: false, lastError: null });
+        const newSocket = io(BACKEND_URL, {
+            transports: ['websocket', 'polling'],
+            autoConnect: true,
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 1000,
+            reconnectionDelayMax: 5000,
+            timeout: 20000
         });
 
-        // Handle errors
-        socket.on('error', (error) => {
-            setConnectionStatus({ isConnected: false, lastError: error.message });
+        // Connection handlers
+        newSocket.on('connect', () => {
+            console.log('[WebSocket] Connected with ID:', newSocket.id);
+            setConnectionStatus({ isConnected: true, lastError: null });
+            
+            // Request initial data
+            newSocket.emit('request_hello');
         });
+
+        newSocket.on('disconnect', (reason) => {
+            console.log('[WebSocket] Disconnected:', reason);
+            setConnectionStatus({ isConnected: false, lastError: null });
+            setHelloMessage(null);
+            setArbitrageData(null);
+        });
+
+        newSocket.on('connect_error', (error) => {
+            console.error('[WebSocket] Connection error:', error.message);
+            setConnectionStatus({ 
+                isConnected: false, 
+                lastError: `Connection error: ${error.message}` 
+            });
+        });
+
+        // Message handlers
+        newSocket.on('hello', (data: HelloMessage) => {
+            console.log('[WebSocket] Hello message received:', data);
+            setHelloMessage(data);
+            setLastUpdate(new Date());
+        });
+
+        newSocket.on('client_data', (data: { type: string; data: ArbitrageData; timestamp: string }) => {
+            console.log('[WebSocket] Raw client data received:', JSON.stringify(data, null, 2));
+            
+            if (data.type === 'arbitrage_update') {
+                console.log('[WebSocket] Processing arbitrage update...');
+                setArbitrageData(data.data);
+                setLastUpdate(new Date(data.timestamp));
+                
+                // Log detailed arbitrage information
+                if (data.data.status === 'success') {
+                    console.log('[WebSocket] Arbitrage opportunity found:', {
+                        crypto: data.data.crypto,
+                        buy: `${data.data.lowest_price_exchange} at ${data.data.lowest_price} ${data.data.buy_currency}`,
+                        sell: `${data.data.highest_price_exchange} at ${data.data.highest_price} ${data.data.sell_currency}`,
+                        profit: data.data.arbitrage_after_fees,
+                        timestamp: data.timestamp
+                    });
+                } else {
+                    console.log('[WebSocket] Non-success arbitrage status:', {
+                        status: data.data.status,
+                        message: data.data.message,
+                        timestamp: data.timestamp
+                    });
+                }
+            } else {
+                console.log('[WebSocket] Unknown data type received:', data.type);
+            }
+        });
+
+        // Store socket instance
+        setSocket(newSocket);
 
         // Cleanup on unmount
         return () => {
-            socket.off('client data');
-            socket.off('connect');
-            socket.off('disconnect');
-            socket.off('error');
+            console.log('[WebSocket] Cleaning up connection');
+            newSocket.disconnect();
         };
-    }, []);
+    }, []); // Empty dependency array - only run once on mount
 
-    return { message, connectionStatus };
+    // Helper function to check if data is fresh (within last 30 seconds)
+    const isDataFresh = lastUpdate ? (new Date().getTime() - lastUpdate.getTime()) < 3000 : false;
+
+    return {
+        arbitrageData,
+        helloMessage,
+        connectionStatus,
+        lastUpdate,
+        isDataFresh,
+        socket
+    };
 };
 
 export default useWebSocket;

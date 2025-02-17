@@ -58,7 +58,7 @@ def handle_connect():
         logger.info(f"Client successfully connected - ID: {client_id}")
         
         # Send a hello message when client connects
-        price_tracker._emit_hello_message()
+        price_tracker.emit_hello_message()
     except Exception as e:
         logger.error(f"Error handling connection: {str(e)}", exc_info=True)
 
