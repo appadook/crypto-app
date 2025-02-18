@@ -37,7 +37,7 @@ class DataCollector:
             if not arbitrage_data or not arbitrage_data.get('lowest_price_exchange'):
                 return {
                     'status': 'no_arbitrage',
-                    'message': 'No valid arbitrage opportunities found'
+                    'message': 'Need more data to calculate arbitrage'
                 }
 
             lowest_price = arbitrage_data['lowest_price']

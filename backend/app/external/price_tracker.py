@@ -224,7 +224,9 @@ class PriceTracker:
     
     def has_valid_exchange_rates(self):
         """Check if we have valid exchange rates for all currencies."""
-        # For testing purposes, always return True to allow hardcoded data
+        for currency, rate_data in self.exchange_rates.items():
+            if rate_data['rate'] is None:
+                return False
         return True
 
     def _emit_client_data(self):
@@ -307,7 +309,7 @@ class PriceTracker:
                 
                 # First send hello message
                 message_data = {
-                    'message': 'Hello from backend!',
+                    'message': 'You are connected to the server!',
                     'timestamp': current_time.isoformat()
                 }
                 self.socketio.emit('hello', message_data)
@@ -323,7 +325,7 @@ class PriceTracker:
             try:
                 if self.socketio:
                     retry_data = {
-                        'message': 'Hello from backend! (retry)',
+                        'message': 'You are connected to the server!(retry)',
                         'timestamp': datetime.now().isoformat()
                     }
                     self.socketio.emit('hello', retry_data)
