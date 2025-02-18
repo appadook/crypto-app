@@ -1,10 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView, StyleSheet, ActivityIndicator } from 'react-native';
 import useWebSocket from '@/hooks/useWebSocket';
+import { useHighestProfit } from '@/hooks/useHighestProfit';
 
 export default function LiveArbitrageScreen() {
   const { arbitrageData, helloMessage, connectionStatus, lastUpdate, isDataFresh } = useWebSocket();
   const [lastHelloMessage, setLastHelloMessage] = useState<string | null>(null);
+
+  // Use the useHighestProfit hook
+  const highestProfit = useHighestProfit(arbitrageData);
 
   // Update lastHelloMessage when helloMessage changes
   useEffect(() => {
@@ -17,7 +21,7 @@ export default function LiveArbitrageScreen() {
   // Log when arbitrage data changes
   useEffect(() => {
     if (arbitrageData) {
-      console.log('[NewTab] Arbitrage data updated:', {
+      console.log('[LiveArbitrage] Arbitrage data updated:', {
         status: arbitrageData.status,
         timestamp: lastUpdate?.toISOString()
       });
@@ -107,6 +111,14 @@ export default function LiveArbitrageScreen() {
           <Text style={styles.feesText}>Total Fees: {formatCurrency(arbitrageData.total_fees || 0)}</Text>
           <Text style={[styles.profitText, { color: profitColor }]}>Profit after Fees: {formatCurrency(arbitrageData.arbitrage_after_fees || 0)}</Text>
         </View>
+
+        {/* Display Highest Profit */}
+        {highestProfit && (
+          <View style={styles.highestProfitContainer}>
+            <Text style={styles.highestProfitText}>Highest Profit: {formatCurrency(highestProfit.profit)}</Text>
+            <Text style={styles.highestProfitTimestamp}>Recorded at: {highestProfit.timestamp.toLocaleTimeString()}</Text>
+          </View>
+        )}
       </View>
     );
   };
@@ -348,5 +360,20 @@ const styles = StyleSheet.create({
   },
   staleLastUpdateText: {
     color: '#ffaa00',
+  },
+  highestProfitContainer: {
+    padding: 16,
+    backgroundColor: '#004d00',
+    borderRadius: 8,
+    marginTop: 16,
+  },
+  highestProfitText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#ffffff',
+  },
+  highestProfitTimestamp: {
+    fontSize: 12,
+    color: '#cccccc',
   },
 });
