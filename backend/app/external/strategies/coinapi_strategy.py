@@ -26,12 +26,23 @@ class CoinAPIStrategy(WebSocketStrategy):
             "heartbeat": False,
             "subscribe_data_type": ["trade"],
             "subscribe_filter_symbol_id": [
-                "BITSTAMP_SPOT_BTC_USD", "BITSTAMP_SPOT_ETH_USD",
-                "KRAKEN_SPOT_BTC_USD", "KRAKEN_SPOT_ETH_USD",
-                "BINANCE_SPOT_BTC_USDT", "BINANCE_SPOT_ETH_USDT",
+                # USD pairs
                 "COINBASE_SPOT_BTC_USD", "COINBASE_SPOT_ETH_USD",
-                "COINBASE_SPOT_BTC_EUR", "BITSTAMP_SPOT_BTC_EUR",
-                "KRAKEN_SPOT_BTC_EUR",
+                "BINANCE_SPOT_BTC_USDT", "BINANCE_SPOT_ETH_USDT",
+                "KRAKEN_SPOT_BTC_USD", "KRAKEN_SPOT_ETH_USD",
+                "BITSTAMP_SPOT_BTC_USD", "BITSTAMP_SPOT_ETH_USD",
+                
+                # EUR pairs
+                "COINBASE_SPOT_BTC_EUR", "COINBASE_SPOT_ETH_EUR",
+                "BINANCE_SPOT_BTC_EUR", "BINANCE_SPOT_ETH_EUR",
+                "KRAKEN_SPOT_BTC_EUR", "KRAKEN_SPOT_ETH_EUR",
+                "BITSTAMP_SPOT_BTC_EUR", "BITSTAMP_SPOT_ETH_EUR",
+                
+                # GBP pairs
+                "COINBASE_SPOT_BTC_GBP", "COINBASE_SPOT_ETH_GBP",
+                "BINANCE_SPOT_BTC_GBP", "BINANCE_SPOT_ETH_GBP",
+                "KRAKEN_SPOT_BTC_GBP", "KRAKEN_SPOT_ETH_GBP",
+                "BITSTAMP_SPOT_BTC_GBP", "BITSTAMP_SPOT_ETH_GBP",
             ]
         }
 
@@ -41,7 +52,11 @@ class CoinAPIStrategy(WebSocketStrategy):
         self.processor.process_message(data)
 
     def get_supported_pairs(self) -> list[str]:
-        return ["BTC/USD", "ETH/USD", "BTC/EUR"]
+        return [
+            "BTC/USD", "ETH/USD",
+            "BTC/EUR", "ETH/EUR",
+            "BTC/GBP", "ETH/GBP"
+        ]
 
     def get_name(self) -> str:
         return "coinapi"

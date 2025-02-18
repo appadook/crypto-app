@@ -44,24 +44,37 @@ class FeeCalculator:
 
         rate = self.exchange_rates[currency_withdrawal]['rate'] if isinstance(self.exchange_rates[currency_withdrawal], dict) else self.exchange_rates[currency_withdrawal]['rate']
         
+        # Ensure rate is a float
+        if not isinstance(rate, (int, float)):
+            print(f"Invalid rate for {currency_withdrawal}: {rate}")
+            raise ValueError(f"Rate for {currency_withdrawal} is not a valid number")
+
+
         # Normalize the fiat fee to USD using the exchange rate
         return fiat_fee * rate
 
     def calculate_fees(self):
         """Calculate total fees for buying and selling crypto"""
         
+
         # Calculate buying fees
         trading_fee_buy = self.crypto_amount * self.crypto_price_buy * self.get_trading_fees(self.exchange_buy, "buy")
+        
+
         # spread_fee_buy = self.crypto_amount * self.crypto_price_buy * self.get_spread_fees(self.exchange_buy, "buy")
         payment_fee = self.crypto_amount * self.crypto_price_buy * self.FEE_STRUCTURES[self.exchange_buy]["payment_fee"]
+        
 
         # Calculate selling fees
         trading_fee_sell = self.crypto_amount * self.crypto_price_sell * self.get_trading_fees(self.exchange_sell, "sell")
+        
+
         # spread_fee_sell = self.crypto_amount * self.crypto_price_sell * self.get_spread_fees(self.exchange_sell, "sell")
 
         # Calculate withdrawal fee
         withdrawal_type = "crypto" if self.currency_withdrawal.upper() == self.crypto.upper() else "fiat"
         withdrawal_fee = self.get_withdrawal_fee(self.exchange_sell, self.currency_withdrawal, withdrawal_type)
+        
 
         total_fees = (
             trading_fee_buy +
@@ -71,6 +84,7 @@ class FeeCalculator:
             # spread_fee_sell +
             withdrawal_fee
         )
+        print(f"Total Fees: {total_fees}")
 
         return {
             "trading_fee_buy": trading_fee_buy,

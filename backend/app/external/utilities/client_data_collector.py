@@ -62,7 +62,7 @@ class DataCollector:
 
             # Calculate fees
             fees = fee_calculator.calculate_fees()
-            
+            print(f"Fees: {fees}")
             return {    
                 'status': 'success',
                 'lowest_price': round(lowest_price, 2),

@@ -24,6 +24,8 @@ class CoinAPIProcessor(DataProcessor):  # Inherit from DataProcessor
             return 'USD'
         elif symbol.endswith('_EUR'):
             return 'EUR'
+        elif symbol.endswith('_GBP'):
+            return 'GBP'
         print(f"Unsupported fiat currency for symbol: {symbol}")
         return None
 

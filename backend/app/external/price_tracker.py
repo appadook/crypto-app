@@ -51,8 +51,11 @@ class PriceTracker:
         """
         try:
             # Debug current state
-            self.logger.debug(f"Before update - crypto_prices: {self.crypto_prices}")
-            self.logger.debug(f"Before update - exchange_rates: {self.exchange_rates}")
+            # self.logger.debug(f"Before update - crypto_prices: {self.crypto_prices}")
+            # self.logger.debug(f"Before update - exchange_rates: {self.exchange_rates}")
+
+            # print(f"Before update - crypto_prices: {self.crypto_prices}")
+            # print(f"Before update - exchange_rates: {self.exchange_rates}")
             
             # Validate inputs
             if not all([crypto, exchange, price, timestamp, fiat]):
@@ -156,8 +159,8 @@ class PriceTracker:
             price = data['price']
             exchange = symbol.split('_')[0]
             
-            # Process only USD, USDT, and EUR pairs
-            if not (symbol.endswith('_USD') or symbol.endswith('_USDT') or symbol.endswith('_EUR')):
+            # Process only USD, USDT, EUR, GBP pairs
+            if not (symbol.endswith('_USD') or symbol.endswith('_USDT') or symbol.endswith('_EUR') or symbol.endswith('_GBP')):
                 return None
 
             # Normalize exchange names
@@ -170,6 +173,8 @@ class PriceTracker:
                 fiat = 'EUR'
             elif symbol.endswith('_USDT'):
                 fiat = 'USD'
+            elif symbol.endswith('_GBP'):
+                fiat = 'GBP'
 
             # Update price data with proper fiat currency
             if 'BTC' in symbol:

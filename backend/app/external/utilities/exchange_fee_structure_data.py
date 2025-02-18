@@ -46,11 +46,12 @@ fee_structures = {
     "bitstamp": {  
         "trading_fee_buy": 0.0003,  # 0.03% taker fee (VIP tier: $20M+ 30-day volume)  
         "spread_fee_buy": 0.0,  # No explicit spread fee (dynamic market spread)  
-        "payment_fee": {  
-            "ACH": 0.0,  # Free ACH deposits  
-            "Wire": 0.0,  # Free USD wire deposits  
-            "Credit/Debit Card": 0.05,  # 5% card fee (unchanged for all tiers)  
-        },  
+        # "payment_fee": {  
+        #     "ACH": 0.0,  # Free ACH deposits  
+        #     "Wire": 0.0,  # Free USD wire deposits  
+        #     "Credit/Debit Card": 0.05,  # 5% card fee (unchanged for all tiers)  
+        # },  
+        "payment_fee": 0.0,
         "network_fee": 0.0,  # Covered in withdrawal fees  
         "blockchain_fee": 0.0,  # Covered in withdrawal fees  
         "trading_fee_sell": 0.0003,  # 0.03% taker fee (VIP tier)  
@@ -70,10 +71,11 @@ fee_structures = {
     "kraken": {  
         "trading_fee_buy": 0.0016,  # 0.16% taker fee (highest volume tier: $10M+ 30-day trade volume)  
         "spread_fee_buy": 0.0,  # No explicit spread fee  
-        "payment_fee": {  
-            "ACH": 0.0,  # Free ACH deposits  
-            "Wire": 0.0,  # Free domestic wire deposits  
-        },  
+        # "payment_fee": {  
+        #     "ACH": 0.0,  # Free ACH deposits  
+        #     "Wire": 0.0,  # Free domestic wire deposits  
+        # },  
+        "payment_fee": 0.0,
         "network_fee": 0.0,  # Covered in withdrawal fees  
         "blockchain_fee": 0.0,  
         "trading_fee_sell": 0.0016,  # 0.16% taker fee  

@@ -3,6 +3,26 @@
 ## Overview
 A real-time cryptocurrency analytics web application that fetches live prices of cryptocurrencies in various fiat currencies across multiple exchanges. The app calculates arbitrage opportunities in real-time and displays the results on a dynamic, user-friendly interface.
 
+## Execution
+start frontend first in a seperate terminal
+```bash
+cd frontend
+npx expo start --ios
+```
+
+start backend in current terminal
+- if you haven't already activated the virtual environment, activate it
+```bash
+cd backend
+source venv/bin/activate
+```
+
+- start backend
+```bash
+cd backend
+python start.py
+```
+
 ---
 
 ## Tech Stack
@@ -82,8 +102,8 @@ A real-time cryptocurrency analytics web application that fetches live prices of
 ## Key Frameworks and Libraries
 
 ### Frontend
-- React
-- Next.js
+- React Native
+- Expo
 - Tailwind CSS or Material-UI
 
 ### Backend

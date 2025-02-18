@@ -57,19 +57,11 @@ class CrossExchangeFiatArbitrage:
                                 continue
                             
                             rate = exchange_rate_data.get('rate')
-                            if rate is None:
-                                print(f"Exchange rate for {currency} is None")
-                                continue
-                            
-                            try:
-                                rate = float(rate)
-                                if rate <= 0:
-                                    print(f"Invalid exchange rate value for {currency}: {rate}")
-                                    continue
-                            except (ValueError, TypeError) as e:
-                                print(f"Error converting rate to float for {currency}: {e}")
+                            if rate is None or not isinstance(rate, (int, float)):
+                                print(f"Exchange rate for {currency} is None or invalid")
                                 continue
                         
+
                         # Calculate price in USD
                         price_in_usd = price * rate
                         
