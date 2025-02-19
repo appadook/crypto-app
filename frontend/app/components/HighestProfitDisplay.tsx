@@ -25,7 +25,7 @@ export function HighestProfitDisplay({ highestProfit }: HighestProfitDisplayProp
         Recorded at: {highestProfit.timestamp.toLocaleTimeString()}
       </Text>
       <Text style={styles.exchangeInfo}>
-        {highestProfit.details.crypto}: {highestProfit.details.lowest_price_exchange} → {highestProfit.details.highest_price_exchange}
+        {highestProfit.details.crypto}: {highestProfit.details.lowest_price_exchange} ({highestProfit.details.buy_currency}) → {highestProfit.details.highest_price_exchange} ({highestProfit.details.sell_currency})
       </Text>
     </View>
   );
