@@ -8,7 +8,7 @@ DOUBLE ARBITRAGE
 '''
 import sys
 import os
-from typing import Dict, TypedDict
+from typing import Dict, TypedDict, List
 
 
 # Add the root directory of your project to the sys.path
@@ -20,26 +20,29 @@ class ExchangeRateData(TypedDict):
     rate: float
     timestamp: str
 
+class ArbitrageOpportunity(TypedDict):
+    crypto: str
+    lowest_price: float
+    lowest_price_exchange: tuple
+    highest_price: float
+    highest_price_exchange: tuple
+    spread: float
+
 class CrossExchangeFiatArbitrage:
     def __init__(self, price_data: PriceDataType, exchange_rates: Dict[str, ExchangeRateData]):
         self.price_data = price_data
         self.exchange_rates = exchange_rates
 
-    def find_lowest_and_highest_price(self):
-        lowest_price = float('inf')
-        lowest_price_exchange = None
-        highest_price = float('-inf')
-        highest_price_exchange = None
+    def find_lowest_and_highest_price(self) -> List[ArbitrageOpportunity]:
+        opportunities: List[ArbitrageOpportunity] = []
 
-        # Process one crypto at a time
+        # Process each cryptocurrency
         for crypto, exchanges in self.price_data.items():
-            # Reset for each cryptocurrency
             crypto_lowest_price = float('inf')
             crypto_lowest_exchange = None
             crypto_highest_price = float('-inf')
             crypto_highest_exchange = None
 
-            # Only process the current cryptocurrency's data
             for exchange, currencies in exchanges.items():
                 for currency, data in currencies.items():
                     try:
@@ -50,7 +53,6 @@ class CrossExchangeFiatArbitrage:
                         if currency == 'USD':
                             rate = 1.0
                         else:
-                            # Get exchange rate from dictionary structure
                             exchange_rate_data = self.exchange_rates.get(currency)
                             if not exchange_rate_data or not isinstance(exchange_rate_data, dict):
                                 print(f"Missing or invalid exchange rate data for {currency}")
@@ -60,7 +62,6 @@ class CrossExchangeFiatArbitrage:
                             if rate is None or not isinstance(rate, (int, float)):
                                 print(f"Exchange rate for {currency} is None or invalid")
                                 continue
-                        
 
                         # Calculate price in USD
                         price_in_usd = price * rate
@@ -77,34 +78,33 @@ class CrossExchangeFiatArbitrage:
 
             # If we found both a lowest and highest price for this crypto
             if crypto_lowest_exchange and crypto_highest_exchange:
-                # Only update if this crypto has a better spread
-                current_spread = (crypto_highest_price - crypto_lowest_price) / crypto_lowest_price
-                best_spread = (highest_price - lowest_price) / lowest_price if lowest_price != float('inf') else 0
+                spread = (crypto_highest_price - crypto_lowest_price) / crypto_lowest_price
                 
-                if current_spread > best_spread:
-                    lowest_price = crypto_lowest_price
-                    lowest_price_exchange = crypto_lowest_exchange
-                    highest_price = crypto_highest_price
-                    highest_price_exchange = crypto_highest_exchange
+                # Only add opportunities with a positive spread
+                if spread > 0:
+                    opportunities.append({
+                        'crypto': crypto,
+                        'lowest_price': crypto_lowest_price,
+                        'lowest_price_exchange': crypto_lowest_exchange,
+                        'highest_price': crypto_highest_price,
+                        'highest_price_exchange': crypto_highest_exchange,
+                        'spread': spread
+                    })
 
-        # Return the best arbitrage opportunity found
-        if lowest_price_exchange and highest_price_exchange:
-            return {
-                'lowest_price': lowest_price,
-                'lowest_price_exchange': lowest_price_exchange,
-                'highest_price': highest_price,
-                'highest_price_exchange': highest_price_exchange
-            }
-        else:
-            return None  # Return None if no valid arbitrage opportunity found
+        # Sort opportunities by spread in descending order
+        opportunities.sort(key=lambda x: x['spread'], reverse=True)
+        return opportunities
 
-    def display_arbitrage_opportunity(self):
-        result = self.find_lowest_and_highest_price()
-        if result:
-            print(f"Lowest price: {result['lowest_price']} USD at {result['lowest_price_exchange'][1]} in {result['lowest_price_exchange'][2]} for {result['lowest_price_exchange'][0]}")
-            print(f"Highest price: {result['highest_price']} USD at {result['highest_price_exchange'][1]} in {result['highest_price_exchange'][2]} for {result['highest_price_exchange'][0]}")
+    def display_arbitrage_opportunities(self):
+        opportunities = self.find_lowest_and_highest_price()
+        if opportunities:
+            for opp in opportunities:
+                print(f"\nCryptocurrency: {opp['crypto']}")
+                print(f"Lowest price: {opp['lowest_price']} USD at {opp['lowest_price_exchange'][1]} in {opp['lowest_price_exchange'][2]}")
+                print(f"Highest price: {opp['highest_price']} USD at {opp['highest_price_exchange'][1]} in {opp['highest_price_exchange'][2]}")
+                print(f"Spread: {opp['spread']*100:.2f}%")
         else:
-            print("No valid arbitrage opportunity found.")
+            print("No valid arbitrage opportunities found.")
 
 
 # Example usage
@@ -161,4 +161,4 @@ if __name__ == "__main__":
     }
 
     arbitrage = CrossExchangeFiatArbitrage(price_data, exchange_rates)
-    arbitrage.display_arbitrage_opportunity()
+    arbitrage.display_arbitrage_opportunities()

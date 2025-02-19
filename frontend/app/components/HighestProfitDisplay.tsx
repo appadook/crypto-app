@@ -1,6 +1,12 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { HighestProfitData } from '@/hooks/useHighestProfit';
+import { ArbitrageOpportunityData } from '@/app/types/arbitrage';
+
+interface HighestProfitData {
+  profit: number;
+  timestamp: Date;
+  details: ArbitrageOpportunityData;
+}
 
 interface HighestProfitDisplayProps {
   highestProfit: HighestProfitData | null;
@@ -33,24 +39,24 @@ export function HighestProfitDisplay({ highestProfit }: HighestProfitDisplayProp
 
 const styles = StyleSheet.create({
   highestProfitContainer: {
+    backgroundColor: '#1c1c1c',
     padding: 16,
-    backgroundColor: '#004d00',
     borderRadius: 8,
     marginBottom: 16,
   },
   highestProfitText: {
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#00ff00',
+    marginBottom: 8,
   },
   highestProfitTimestamp: {
-    fontSize: 12,
-    color: '#cccccc',
-    marginTop: 4,
+    fontSize: 14,
+    color: '#888',
+    marginBottom: 4,
   },
   exchangeInfo: {
-    fontSize: 12,
-    color: '#aaaaaa',
-    marginTop: 4,
-  }
+    fontSize: 16,
+    color: '#fff',
+  },
 });

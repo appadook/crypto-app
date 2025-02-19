@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ArbitrageData } from '../app/types/arbitrage';
+import { ArbitrageData, ArbitrageOpportunityData } from '../app/types/arbitrage';
 
 const STORAGE_KEY = 'highest_profit_data';
 
 export interface HighestProfitData {
   profit: number;
   timestamp: Date;
-  details: ArbitrageData;
+  details: ArbitrageOpportunityData;
 }
 
 export function useHighestProfit(currentArbitrageData: ArbitrageData | null) {
@@ -33,23 +33,26 @@ export function useHighestProfit(currentArbitrageData: ArbitrageData | null) {
   useEffect(() => {
     if (
       currentArbitrageData?.status === 'success' && 
-      currentArbitrageData.arbitrage_after_fees && 
-      (
-        !highestProfit || 
-        currentArbitrageData.arbitrage_after_fees > highestProfit.profit
-      )
+      currentArbitrageData.opportunities.length > 0
     ) {
-      const newHighestProfit = {
-        profit: currentArbitrageData.arbitrage_after_fees,
-        timestamp: new Date(),
-        details: { ...currentArbitrageData }
-      };
-      
-      setHighestProfit(newHighestProfit);
-      
-      // Save to AsyncStorage
-      AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newHighestProfit))
-        .catch((error: unknown) => console.error('Error saving highest profit:', error));
+      // Find opportunity with highest profit after fees
+      const highestProfitOpportunity = currentArbitrageData.opportunities.reduce((max, current) => 
+        current.arbitrage_after_fees > (max?.arbitrage_after_fees ?? 0) ? current : max
+      );
+
+      if (!highestProfit || highestProfitOpportunity.arbitrage_after_fees > highestProfit.profit) {
+        const newHighestProfit = {
+          profit: highestProfitOpportunity.arbitrage_after_fees,
+          timestamp: new Date(),
+          details: highestProfitOpportunity
+        };
+        
+        setHighestProfit(newHighestProfit);
+        
+        // Save to AsyncStorage
+        AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(newHighestProfit))
+          .catch((error: unknown) => console.error('Error saving highest profit:', error));
+      }
     }
   }, [currentArbitrageData, highestProfit]);
 
