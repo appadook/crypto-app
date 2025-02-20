@@ -19,27 +19,18 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: 'Arbitrage',
+          title: 'Welcome',
+          tabBarIcon: ({ size, color }) => (
+            <Ionicons name="home" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
+        name="LiveArbitrage"
+        options={{
+          title: 'Live Arbitrage',
           tabBarIcon: ({ size, color }) => (
             <Ionicons name="trending-up" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="markets"
-        options={{
-          title: 'Markets',
-          tabBarIcon: ({ size, color }) => (
-            <Ionicons name="bar-chart" size={size} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="settings"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ size, color }) => (
-            <Ionicons name="settings-outline" size={size} color={color} />
           ),
         }}
       />
