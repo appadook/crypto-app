@@ -2,12 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Text, StyleSheet } from 'react-native';
 import useWebSocket from '@/hooks/useWebSocket';
 import { useHighestProfit } from '@/hooks/useHighestProfit';
-import { HighestProfitDisplay } from '@/app/components/HighestProfitDisplay';
-import { ConnectionStatus } from '@/app/components/ConnectionStatus';
-import { HelloMessage } from '@/app/components/HelloMessage';
-import { ArbitrageOpportunity } from '@/app/components/ArbitrageOpportunity';
-import { LoadingState } from '@/app/components/LoadingState';
-import { StatusMessage } from '@/app/components/StatusMessage';
+import HighestProfitDisplay from '@/app/components/HighestProfitDisplay';
+import ConnectionStatus from '@/app/components/ConnectionStatus';
+import HelloMessage from '@/app/components/HelloMessage';
+import ArbitrageOpportunity from '@/app/components/ArbitrageOpportunity';
+import LoadingState from '@/app/components/LoadingState';
+import StatusMessage from '@/app/components/StatusMessage';
 
 export default function LiveArbitrageScreen() {
   const { arbitrageData, helloMessage, connectionStatus, lastUpdate, isDataFresh } = useWebSocket();

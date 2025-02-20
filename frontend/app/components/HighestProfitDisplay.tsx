@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { ArbitrageOpportunityData } from '@/app/types/arbitrage';
+import { ArbitrageOpportunityData } from '@/types/arbitrage';
 
 interface HighestProfitData {
   profit: number;
@@ -21,7 +21,7 @@ const formatCurrency = (value: number) => {
   }).format(value);
 };
 
-export function HighestProfitDisplay({ highestProfit }: HighestProfitDisplayProps) {
+export default function HighestProfitDisplay({ highestProfit }: HighestProfitDisplayProps) {
   if (!highestProfit) return null;
 
   return (

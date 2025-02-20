@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { ArbitrageData, ArbitrageOpportunityData } from '@/app/types/arbitrage';
+import { ArbitrageData, ArbitrageOpportunityData } from '@/types/arbitrage';
 
 interface ArbitrageOpportunityProps {
     data: ArbitrageData;
@@ -57,7 +57,7 @@ const OpportunityCard = ({ opportunity }: { opportunity: ArbitrageOpportunityDat
     );
 };
 
-export function ArbitrageOpportunity({ data }: ArbitrageOpportunityProps) {
+export default function ArbitrageOpportunity({ data }: ArbitrageOpportunityProps) {
     const sortedOpportunities = [...data.opportunities].sort((a, b) => 
         a.crypto.localeCompare(b.crypto)
     );

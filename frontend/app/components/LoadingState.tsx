@@ -5,7 +5,7 @@ interface LoadingStateProps {
   type: 'connection' | 'data';
 }
 
-export function LoadingState({ type }: LoadingStateProps) {
+export default function LoadingState({ type }: LoadingStateProps) {
   const isConnection = type === 'connection';
   
   return (

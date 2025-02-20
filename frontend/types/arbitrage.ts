@@ -17,5 +17,3 @@ export interface ArbitrageData {
     message?: string;
     opportunities: ArbitrageOpportunityData[];
 }
-
-export type { ArbitrageData, ArbitrageOpportunityData };

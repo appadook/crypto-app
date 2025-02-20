@@ -6,7 +6,7 @@ interface StatusMessageProps {
   message?: string;
 }
 
-export function StatusMessage({ type, message }: StatusMessageProps) {
+export default function StatusMessage({ type, message }: StatusMessageProps) {
   const getContent = () => {
     switch (type) {
       case 'waiting':

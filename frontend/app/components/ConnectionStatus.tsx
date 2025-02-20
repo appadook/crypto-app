@@ -7,7 +7,7 @@ interface ConnectionStatusProps {
   lastUpdate: Date | null;
 }
 
-export function ConnectionStatus({ isConnected, isDataFresh, lastUpdate }: ConnectionStatusProps) {
+export default function ConnectionStatus({ isConnected, isDataFresh, lastUpdate }: ConnectionStatusProps) {
   return (
     <View style={styles.statusBar}>
       <View style={styles.statusContainer}>

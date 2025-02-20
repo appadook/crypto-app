@@ -6,7 +6,7 @@ interface HelloMessageProps {
   timestamp: string | number | Date;
 }
 
-export function HelloMessage({ message, timestamp }: HelloMessageProps) {
+export default function HelloMessage({ message, timestamp }: HelloMessageProps) {
   return (
     <View style={styles.helloContainer}>
       <Text style={styles.helloText}>{message}</Text>
