@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { ArbitrageOpportunityData } from '@/types/arbitrage';
+import { ArbitrageOpportunityData } from '@/app/types/arbitrage';
 
 interface HighestProfitData {
   profit: number;

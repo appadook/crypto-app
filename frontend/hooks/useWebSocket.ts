@@ -1,10 +1,9 @@
 import { useEffect, useState, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
-import { ArbitrageData, ArbitrageOpportunityData } from '@/types/arbitrage';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5001';
 
-interface RawArbitrageData {
+interface ArbitrageData {
     status: 'success' | 'waiting' | 'no_arbitrage' | 'error';
     message?: string;
     crypto?: string;
@@ -16,8 +15,6 @@ interface RawArbitrageData {
     sell_currency?: string;
     total_fees?: number;
     arbitrage_after_fees?: number;
-    spread_percentage?: number;
-    profit_percentage?: number;
 }
 
 interface HelloMessage {
@@ -30,36 +27,8 @@ interface ConnectionStatus {
     lastError: string | null;
 }
 
-const transformArbitrageData = (rawData: RawArbitrageData): ArbitrageData => {
-    if (rawData.status !== 'success') {
-        return {
-            status: rawData.status,
-            message: rawData.message,
-            opportunities: []
-        };
-    }
-
-    const opportunity: ArbitrageOpportunityData = {
-        crypto: rawData.crypto!,
-        lowest_price: rawData.lowest_price!,
-        lowest_price_exchange: rawData.lowest_price_exchange!,
-        highest_price: rawData.highest_price!,
-        highest_price_exchange: rawData.highest_price_exchange!,
-        buy_currency: rawData.buy_currency!,
-        sell_currency: rawData.sell_currency!,
-        spread_percentage: rawData.spread_percentage || 0,
-        total_fees: rawData.total_fees!,
-        arbitrage_after_fees: rawData.arbitrage_after_fees!,
-        profit_percentage: rawData.profit_percentage || 0
-    };
-
-    return {
-        status: 'success',
-        opportunities: [opportunity]
-    };
-};
-
 const useWebSocket = () => {
+    // State
     const [socket, setSocket] = useState<Socket | null>(null);
     const [arbitrageData, setArbitrageData] = useState<ArbitrageData | null>(null);
     const [helloMessage, setHelloMessage] = useState<HelloMessage | null>(null);
@@ -69,6 +38,7 @@ const useWebSocket = () => {
     });
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
+    // Initialize socket connection
     useEffect(() => {
         console.log('[WebSocket] Initializing connection to:', BACKEND_URL);
         
@@ -82,9 +52,12 @@ const useWebSocket = () => {
             timeout: 20000
         });
 
+        // Connection handlers
         newSocket.on('connect', () => {
             console.log('[WebSocket] Connected with ID:', newSocket.id);
             setConnectionStatus({ isConnected: true, lastError: null });
+            
+            // Request initial data
             newSocket.emit('request_hello');
         });
 
@@ -103,21 +76,22 @@ const useWebSocket = () => {
             });
         });
 
+        // Message handlers
         newSocket.on('hello', (data: HelloMessage) => {
             console.log('[WebSocket] Hello message received:', data);
             setHelloMessage(data);
             setLastUpdate(new Date());
         });
 
-        newSocket.on('client_data', (data: { type: string; data: RawArbitrageData; timestamp: string }) => {
+        newSocket.on('client_data', (data: { type: string; data: ArbitrageData; timestamp: string }) => {
             console.log('[WebSocket] Raw client data received:', JSON.stringify(data, null, 2));
             
             if (data.type === 'arbitrage_update') {
                 console.log('[WebSocket] Processing arbitrage update...');
-                const transformedData = transformArbitrageData(data.data);
-                setArbitrageData(transformedData);
+                setArbitrageData(data.data);
                 setLastUpdate(new Date(data.timestamp));
                 
+                // Log detailed arbitrage information
                 if (data.data.status === 'success') {
                     console.log('[WebSocket] Arbitrage opportunity found:', {
                         crypto: data.data.crypto,
@@ -138,14 +112,17 @@ const useWebSocket = () => {
             }
         });
 
+        // Store socket instance
         setSocket(newSocket);
 
+        // Cleanup on unmount
         return () => {
             console.log('[WebSocket] Cleaning up connection');
             newSocket.disconnect();
         };
-    }, []);
+    }, []); // Empty dependency array - only run once on mount
 
+    // Helper function to check if data is fresh (within last 30 seconds)
     const isDataFresh = lastUpdate ? (new Date().getTime() - lastUpdate.getTime()) < 3000 : false;
 
     return {

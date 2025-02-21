@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
-import { ArbitrageData, ArbitrageOpportunityData } from '@/types/arbitrage';
+import { ArbitrageData, ArbitrageOpportunityData } from '@/app/types/arbitrage';
 
 interface ArbitrageOpportunityProps {
     data: ArbitrageData;
