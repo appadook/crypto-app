@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, ScrollView, Text, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 import useWebSocket from '@/hooks/useWebSocket';
 import { useHighestProfit } from '@/hooks/useHighestProfit';
 import HighestProfitDisplay from '@/app/components/HighestProfitDisplay';
@@ -47,50 +49,79 @@ export default function LiveArbitrageScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <HighestProfitDisplay highestProfit={highestProfit} />
-      
-      <ConnectionStatus 
-        isConnected={connectionStatus.isConnected}
-        isDataFresh={isDataFresh}
-        lastUpdate={lastUpdate}
-      />
-
-      {connectionStatus.lastError && (
-        <Text style={styles.errorText}>{connectionStatus.lastError}</Text>
-      )}
-
-      {helloMessage && (
-        <HelloMessage 
-          message={helloMessage.message}
-          timestamp={helloMessage.timestamp}
+    <SafeAreaView style={styles.safeArea} edges={['top']}>
+      <LinearGradient
+        colors={['#000000', '#1A1A1A']}
+        style={styles.container}
+      >
+        <Text style={styles.screenTitle}>Live Arbitrage</Text>
+        
+        <HighestProfitDisplay highestProfit={highestProfit} />
+        
+        <ConnectionStatus 
+          isConnected={connectionStatus.isConnected}
+          isDataFresh={isDataFresh}
+          lastUpdate={lastUpdate}
         />
-      )}
 
-      <ScrollView style={styles.scrollView}>
-        {renderArbitrageContent()}
-      </ScrollView>
-    </View>
+        {connectionStatus.lastError && (
+          <Text style={styles.errorText}>{connectionStatus.lastError}</Text>
+        )}
+
+        {helloMessage && (
+          <HelloMessage 
+            message={helloMessage.message}
+            timestamp={helloMessage.timestamp}
+          />
+        )}
+
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={styles.scrollViewContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {renderArbitrageContent()}
+        </ScrollView>
+      </LinearGradient>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#000000',
+  },
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: '#000000',
+    paddingBottom: 60, // Exact match to tab bar height
+  },
+  screenTitle: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: '#00FF9D',
+    marginBottom: 20,
+    textAlign: 'left',
+    marginTop: 8,
   },
   scrollView: {
     flex: 1,
-    backgroundColor: '#1c1c1c',
-    borderRadius: 8,
-    padding: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    borderRadius: 12,
+    marginTop: 8,
+  },
+  scrollViewContent: {
+    padding: 16,
   },
   errorText: {
     color: '#ff4c4c',
     marginBottom: 16,
-    padding: 8,
-    backgroundColor: '#330000',
-    borderRadius: 4,
+    padding: 12,
+    backgroundColor: 'rgba(255, 76, 76, 0.1)',
+    borderRadius: 8,
+    overflow: 'hidden',
+    borderLeftWidth: 4,
+    borderLeftColor: '#ff4c4c',
   },
 });
