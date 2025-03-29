@@ -63,15 +63,21 @@ export default function ArbitrageOpportunity({ data }: ArbitrageOpportunityProps
     );
 
     return (
-        <ScrollView style={styles.container}>
-            {sortedOpportunities.map((opportunity, index) => (
-                <OpportunityCard key={`${opportunity.crypto}-${index}`} opportunity={opportunity} />
-            ))}
-        </ScrollView>
+        <View style={styles.wrapper}>
+            <ScrollView style={styles.container}>
+                {sortedOpportunities.map((opportunity, index) => (
+                    <OpportunityCard key={`${opportunity.crypto}-${index}`} opportunity={opportunity} />
+                ))}
+            </ScrollView>
+        </View>
     );
 }
 
 const styles = StyleSheet.create({
+    wrapper: {
+        flex: 1,
+        marginTop: 8,
+    },
     container: {
         flex: 1,
     },

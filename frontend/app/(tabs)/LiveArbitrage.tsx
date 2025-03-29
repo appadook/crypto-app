@@ -54,15 +54,16 @@ export default function LiveArbitrageScreen() {
         colors={['#000000', '#1A1A1A']}
         style={styles.container}
       >
-        <Text style={styles.screenTitle}>Live Arbitrage</Text>
-        
+        <View style={styles.header}>
+          <Text style={styles.screenTitle}>Live Arbitrage</Text>
+          <ConnectionStatus 
+            isConnected={connectionStatus.isConnected}
+            isDataFresh={isDataFresh}
+            lastUpdate={lastUpdate}
+          />
+        </View>
+
         <HighestProfitDisplay highestProfit={highestProfit} />
-        
-        <ConnectionStatus 
-          isConnected={connectionStatus.isConnected}
-          isDataFresh={isDataFresh}
-          lastUpdate={lastUpdate}
-        />
 
         {connectionStatus.lastError && (
           <Text style={styles.errorText}>{connectionStatus.lastError}</Text>
@@ -75,13 +76,7 @@ export default function LiveArbitrageScreen() {
           />
         )}
 
-        <ScrollView 
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollViewContent}
-          showsVerticalScrollIndicator={false}
-        >
-          {renderArbitrageContent()}
-        </ScrollView>
+        {renderArbitrageContent()}
       </LinearGradient>
     </SafeAreaView>
   );
@@ -95,28 +90,20 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    paddingBottom: 60, // Exact match to tab bar height
+    paddingTop: 8,
+  },
+  header: {
+    marginBottom: 8,
   },
   screenTitle: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#00FF9D',
-    marginBottom: 20,
-    textAlign: 'left',
-    marginTop: 8,
-  },
-  scrollView: {
-    flex: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    borderRadius: 12,
-    marginTop: 8,
-  },
-  scrollViewContent: {
-    padding: 16,
+    marginBottom: 8,
   },
   errorText: {
     color: '#ff4c4c',
-    marginBottom: 16,
+    marginBottom: 12,
     padding: 12,
     backgroundColor: 'rgba(255, 76, 76, 0.1)',
     borderRadius: 8,
