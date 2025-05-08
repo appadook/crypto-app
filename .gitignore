@@ -39,3 +39,5 @@ archive/
 frontend/.bolt/
 
 /.expo/
+backend/app/external/utilities/data/
+viz_tools/strategy_time_series.py
