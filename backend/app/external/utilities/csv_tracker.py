@@ -216,36 +216,43 @@ class CSVTracker:
 
                     # Calculate arbitrage using CrossExchangeFiatArbitrage
                     arbitrage_calc = CrossExchangeFiatArbitrage(price_data, exchange_rates)
-                    arb_result = arbitrage_calc.find_lowest_and_highest_price()
-
-                    # Only proceed if we have valid arbitrage results AND they're for the current crypto
-                    if (arb_result['lowest_price_exchange'] and 
-                        arb_result['highest_price_exchange'] and
-                        arb_result['lowest_price_exchange'][0] == crypto and
-                        arb_result['highest_price_exchange'][0] == crypto):
+                    opportunities = arbitrage_calc.find_lowest_and_highest_price()
+                    
+                    # Filter opportunities for current crypto
+                    crypto_opportunities = [opp for opp in opportunities if opp['crypto'] == crypto]
+                    
+                    # Process if we found opportunities for this crypto
+                    if crypto_opportunities:
+                        # Use the best opportunity (first in list since they're sorted by spread)
+                        arb_result = crypto_opportunities[0]
+                        
+                        # Extract lowest and highest price info
+                        lowest_price = arb_result['lowest_price']
+                        highest_price = arb_result['highest_price']
+                        lowest_exchange = arb_result['lowest_price_exchange']
+                        highest_exchange = arb_result['highest_price_exchange']
                         
                         # Calculate arbitrage percentage
-                        arbitrage_percentage = ((arb_result['highest_price'] - arb_result['lowest_price']) / 
-                                             arb_result['lowest_price']) * 100
+                        arbitrage_percentage = ((highest_price - lowest_price) / lowest_price) * 100
 
                         # Create strategy description
-                        strategy = (f"Buy at {arb_result['lowest_price_exchange'][1]} in "
-                                  f"{arb_result['lowest_price_exchange'][2]} -> Sell at "
-                                  f"{arb_result['highest_price_exchange'][1]} in "
-                                  f"{arb_result['highest_price_exchange'][2]}")
+                        strategy = (f"Buy at {lowest_exchange[1]} in "
+                                  f"{lowest_exchange[2]} -> Sell at "
+                                  f"{highest_exchange[1]} in "
+                                  f"{highest_exchange[2]}")
 
                         row['strategy'] = strategy
                         row['arbitrage'] = f"{arbitrage_percentage:.2f}%"
 
                         # Calculate fees using FeeCalculator
                         fee_calc = FeeCalculator(
-                            exchange_buy=arb_result['lowest_price_exchange'][1],
-                            exchange_sell=arb_result['highest_price_exchange'][1],
+                            exchange_buy=lowest_exchange[1],
+                            exchange_sell=highest_exchange[1],
                             crypto=crypto,
                             crypto_amount=1,
-                            crypto_price_buy=arb_result['lowest_price'],
-                            crypto_price_sell=arb_result['highest_price'],
-                            currency_withdrawal=arb_result['highest_price_exchange'][2],
+                            crypto_price_buy=lowest_price,
+                            crypto_price_sell=highest_price,
+                            currency_withdrawal=highest_exchange[2],
                             exchange_rates=exchange_rates
                         )
                         
@@ -257,10 +264,6 @@ class CSVTracker:
                         except Exception as e:
                             # print(f"DEBUG: Error calculating fees or writing row: {str(e)}")
                             continue
-                #     else:
-                #         print(f"DEBUG: No valid arbitrage found for {crypto} or results are for different crypto")
-                # else:
-                #     print("DEBUG: Validation failed - not enough exchanges or price points")
 
     def get_arbitrage_strategy(self):
         """

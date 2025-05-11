@@ -111,3 +111,24 @@ python start.py
 - Flask-SocketIO
 - websocket-client (for WebSocket communication with CoinAPI)
 
+## Running the Analysis Tool
+# 1. First classify the strategies
+python backend/analysis/classify_strategies.py backend/app/external/utilities/crypto_arbitrage_3_2025-05-08.csv
+
+# 2. Then run the individual analysis scripts
+python backend/analysis/strategy_frequency.py backend/app/external/utilities/crypto_arbitrage_3_2025-05-08_classified.csv
+
+python backend/analysis/strategy_percentage.py backend/app/external/utilities/crypto_arbitrage_3_2025-05-08_classified.csv
+
+python backend/analysis/strategy_profit.py backend/app/external/utilities/crypto_arbitrage_3_2025-05-08_classified.csv
+
+# 3. Run the new visualization scripts
+# Network analysis - creates exchange relationship visualizations
+python backend/analysis/network_analysis.py backend/app/external/utilities/crypto_arbitrage_3_2025-05-08_classified.csv
+
+# Exchange pair analysis - visualizes exchange performance with heatmaps and charts
+python backend/analysis/exchange_pair_analysis.py backend/app/external/utilities/crypto_arbitrage_3_2025-05-08_classified.csv
+
+# Currency analysis - shows currency relationships and profit patterns
+python backend/analysis/currency_analysis.py backend/app/external/utilities/crypto_arbitrage_3_2025-05-08_classified.csv
+<!-- Classified data written to backend/app/external/utilities/crypto_arbitrage_3_2025-05-08_classified.csv -->
