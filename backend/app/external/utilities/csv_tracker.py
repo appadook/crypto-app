@@ -169,6 +169,11 @@ class CSVTracker:
         for exchange in supported_exchanges:
             for fiat in supported_fiats:
                 fieldnames.append(f"{exchange}_{fiat}")
+        
+        # Add exchange rate columns
+        for fiat in supported_fiats:
+            fieldnames.append(f"{fiat}_RATE/USD")
+            
         fieldnames.extend(['strategy', 'arbitrage', 'total_fees', 'arbitrage_after_fees'])
 
         # Generate filename with today's date
@@ -213,6 +218,14 @@ class CSVTracker:
                                 row[column_name] = f"{exchanges[exchange][fiat]['price']:.2f}"
                             else:
                                 row[column_name] = "N/A"
+                    
+                    # Add exchange rate values
+                    for fiat in supported_fiats:
+                        rate_column = f"{fiat}_RATE/USD"
+                        if fiat in exchange_rates:
+                            row[rate_column] = f"{exchange_rates[fiat]:.4f}"
+                        else:
+                            row[rate_column] = "N/A"
 
                     # Calculate arbitrage using CrossExchangeFiatArbitrage
                     arbitrage_calc = CrossExchangeFiatArbitrage(price_data, exchange_rates)
@@ -261,7 +274,7 @@ class CSVTracker:
                             row['total_fees'] = f"${fees['total_fees']:.2f}"
                             row['arbitrage_after_fees'] = f"${fees['arbitrage_after_fees']:.2f}"
                             writer.writerow(row)
-                        except Exception as e:
+                        except Exception:
                             # print(f"DEBUG: Error calculating fees or writing row: {str(e)}")
                             continue
 
