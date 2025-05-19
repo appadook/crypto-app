@@ -54,13 +54,22 @@ class CrossExchangeFiatArbitrage:
                             rate = 1.0
                         else:
                             exchange_rate_data = self.exchange_rates.get(currency)
-                            if not exchange_rate_data or not isinstance(exchange_rate_data, dict):
-                                print(f"Missing or invalid exchange rate data for {currency}")
+                            if exchange_rate_data is None:
+                                print(f"Missing exchange rate data for {currency}")
                                 continue
                             
-                            rate = exchange_rate_data.get('rate')
-                            if rate is None or not isinstance(rate, (int, float)):
-                                print(f"Exchange rate for {currency} is None or invalid")
+                            # Handle both dictionary with 'rate' key and direct float value formats
+                            if isinstance(exchange_rate_data, dict):
+                                rate = exchange_rate_data.get('rate')
+                                if rate is None:
+                                    print(f"Exchange rate for {currency} is missing 'rate' key")
+                                    continue
+                            else:
+                                # Assume it's a direct float value
+                                rate = exchange_rate_data
+                            
+                            if not isinstance(rate, (int, float)):
+                                print(f"Exchange rate for {currency} is not a valid number: {rate}")
                                 continue
 
                         # Calculate price in USD

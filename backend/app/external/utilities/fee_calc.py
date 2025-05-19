@@ -42,7 +42,10 @@ class FeeCalculator:
         withdrawal_method = next(iter(fiat_methods))  # Get the first method
         fiat_fee = fiat_methods[withdrawal_method]
 
-        rate = self.exchange_rates[currency_withdrawal]['rate'] if isinstance(self.exchange_rates[currency_withdrawal], dict) else self.exchange_rates[currency_withdrawal]['rate']
+        # Handle both dictionary with 'rate' key and direct float value formats
+        rate = self.exchange_rates[currency_withdrawal]
+        if isinstance(rate, dict) and 'rate' in rate:
+            rate = rate['rate']
         
         # Ensure rate is a float
         if not isinstance(rate, (int, float)):

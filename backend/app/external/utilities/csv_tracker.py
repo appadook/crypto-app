@@ -223,60 +223,84 @@ class CSVTracker:
                     for fiat in supported_fiats:
                         rate_column = f"{fiat}_RATE/USD"
                         if fiat in exchange_rates:
-                            row[rate_column] = f"{exchange_rates[fiat]:.4f}"
+                            # Handle both dictionary and direct float formats
+                            rate_value = exchange_rates[fiat]
+                            if isinstance(rate_value, dict) and 'rate' in rate_value:
+                                rate_value = rate_value['rate']
+                            row[rate_column] = f"{rate_value:.4f}"
                         else:
                             row[rate_column] = "N/A"
 
+                    # Prepare exchange rates in the format expected by CrossExchangeFiatArbitrage
+                    formatted_exchange_rates = {}
+                    for fiat, rate in exchange_rates.items():
+                        if isinstance(rate, dict) and 'rate' in rate:
+                            # Already in correct format
+                            formatted_exchange_rates[fiat] = rate
+                        else:
+                            # Convert to dictionary format
+                            formatted_exchange_rates[fiat] = {'rate': rate, 'timestamp': datetime.now().isoformat()}
+
                     # Calculate arbitrage using CrossExchangeFiatArbitrage
-                    arbitrage_calc = CrossExchangeFiatArbitrage(price_data, exchange_rates)
-                    opportunities = arbitrage_calc.find_lowest_and_highest_price()
-                    
-                    # Filter opportunities for current crypto
-                    crypto_opportunities = [opp for opp in opportunities if opp['crypto'] == crypto]
-                    
-                    # Process if we found opportunities for this crypto
-                    if crypto_opportunities:
-                        # Use the best opportunity (first in list since they're sorted by spread)
-                        arb_result = crypto_opportunities[0]
+                    try:
+                        print(f"Looking for arbitrage opportunities for {crypto}...")
+                        arbitrage_calc = CrossExchangeFiatArbitrage(price_data, formatted_exchange_rates)
+                        opportunities = arbitrage_calc.find_lowest_and_highest_price()
                         
-                        # Extract lowest and highest price info
-                        lowest_price = arb_result['lowest_price']
-                        highest_price = arb_result['highest_price']
-                        lowest_exchange = arb_result['lowest_price_exchange']
-                        highest_exchange = arb_result['highest_price_exchange']
+                        # Filter opportunities for current crypto
+                        crypto_opportunities = [opp for opp in opportunities if opp['crypto'] == crypto]
+                        print(f"Found {len(crypto_opportunities)} opportunities for {crypto}")
                         
-                        # Calculate arbitrage percentage
-                        arbitrage_percentage = ((highest_price - lowest_price) / lowest_price) * 100
+                        # Process if we found opportunities for this crypto
+                        if crypto_opportunities:
+                            # Use the best opportunity (first in list since they're sorted by spread)
+                            arb_result = crypto_opportunities[0]
+                            
+                            # Extract lowest and highest price info
+                            lowest_price = arb_result['lowest_price']
+                            highest_price = arb_result['highest_price']
+                            lowest_exchange = arb_result['lowest_price_exchange']
+                            highest_exchange = arb_result['highest_price_exchange']
+                            
+                            # Calculate arbitrage percentage
+                            arbitrage_percentage = ((highest_price - lowest_price) / lowest_price) * 100
 
-                        # Create strategy description
-                        strategy = (f"Buy at {lowest_exchange[1]} in "
-                                  f"{lowest_exchange[2]} -> Sell at "
-                                  f"{highest_exchange[1]} in "
-                                  f"{highest_exchange[2]}")
+                            # Create strategy description
+                            strategy = (f"Buy at {lowest_exchange[1]} in "
+                                      f"{lowest_exchange[2]} -> Sell at "
+                                      f"{highest_exchange[1]} in "
+                                      f"{highest_exchange[2]}")
 
-                        row['strategy'] = strategy
-                        row['arbitrage'] = f"{arbitrage_percentage:.2f}%"
+                            row['strategy'] = strategy
+                            row['arbitrage'] = f"{arbitrage_percentage:.2f}%"
 
-                        # Calculate fees using FeeCalculator
-                        fee_calc = FeeCalculator(
-                            exchange_buy=lowest_exchange[1],
-                            exchange_sell=highest_exchange[1],
-                            crypto=crypto,
-                            crypto_amount=1,
-                            crypto_price_buy=lowest_price,
-                            crypto_price_sell=highest_price,
-                            currency_withdrawal=highest_exchange[2],
-                            exchange_rates=exchange_rates
-                        )
-                        
-                        try:
-                            fees = fee_calc.calculate_fees()
-                            row['total_fees'] = f"${fees['total_fees']:.2f}"
-                            row['arbitrage_after_fees'] = f"${fees['arbitrage_after_fees']:.2f}"
-                            writer.writerow(row)
-                        except Exception:
-                            # print(f"DEBUG: Error calculating fees or writing row: {str(e)}")
-                            continue
+                            # Calculate fees using FeeCalculator
+                            print(f"Calculating fees for {crypto}...")
+                            fee_calc = FeeCalculator(
+                                exchange_buy=lowest_exchange[1],
+                                exchange_sell=highest_exchange[1],
+                                crypto=crypto,
+                                crypto_amount=1,
+                                crypto_price_buy=lowest_price,
+                                crypto_price_sell=highest_price,
+                                currency_withdrawal=highest_exchange[2],
+                                exchange_rates=formatted_exchange_rates
+                            )
+                            
+                            try:
+                                fees = fee_calc.calculate_fees()
+                                row['total_fees'] = f"${fees['total_fees']:.2f}"
+                                row['arbitrage_after_fees'] = f"${fees['arbitrage_after_fees']:.2f}"
+                                print(f"Writing row for {crypto} with arbitrage {arbitrage_percentage:.2f}%")
+                                writer.writerow(row)
+                            except Exception as e:
+                                print(f"Error calculating fees for {crypto}: {str(e)}")
+                                continue
+                        else:
+                            print(f"No arbitrage opportunities found for {crypto}")
+                    except Exception as e:
+                        print(f"Error processing arbitrage for {crypto}: {str(e)}")
+                        continue
 
     def get_arbitrage_strategy(self):
         """

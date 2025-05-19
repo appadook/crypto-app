@@ -83,7 +83,18 @@ class PriceTracker:
             self._update_display()
             self.csv_tracker.write_spread_strategy(self.crypto_prices)
             self.csv_tracker.write_fiat_arbitrage(self.crypto_prices, self.exchange_rates)
-            self.csv_tracker.write_cross_exchange_fiat_arbitrage(self.crypto_prices, self.exchange_rates)
+            
+            # For write_cross_exchange_fiat_arbitrage, ensure exchange_rates are in the right format
+            formatted_rates = {}
+            for currency, rate_data in self.exchange_rates.items():
+                if isinstance(rate_data, dict) and 'rate' in rate_data:
+                    # Already in the right format
+                    formatted_rates[currency] = rate_data
+                else:
+                    # Convert simple value to dict with 'rate' key
+                    formatted_rates[currency] = {'rate': rate_data, 'timestamp': datetime.now().isoformat()}
+            
+            self.csv_tracker.write_cross_exchange_fiat_arbitrage(self.crypto_prices, formatted_rates)
 
             # Only emit client data for price updates (more frequent than hello messages)
             self._emit_client_data()
