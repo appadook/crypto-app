@@ -81,8 +81,8 @@ class PriceTracker:
             
             self.message_count += 1
             self._update_display()
-            self.csv_tracker.write_spread_strategy(self.crypto_prices)
-            self.csv_tracker.write_fiat_arbitrage(self.crypto_prices, self.exchange_rates)
+            # self.csv_tracker.write_spread_strategy(self.crypto_prices)
+            # self.csv_tracker.write_fiat_arbitrage(self.crypto_prices, self.exchange_rates)
             
             # For write_cross_exchange_fiat_arbitrage, ensure exchange_rates are in the right format
             formatted_rates = {}

@@ -12,6 +12,7 @@ import csv
 from datetime import datetime
 from app.types.price_data_types import PriceData
 from app.external.utilities.cross_exchange_fiat_arbitrage import CrossExchangeFiatArbitrage
+import os
 
 
 class CSVTracker:
@@ -181,6 +182,17 @@ class CSVTracker:
 
         # Check if file exists and is empty
         file_exists = os.path.exists(file_path) and os.path.getsize(file_path) > 0
+        
+        # Check file size - only proceed if under 2GB (2 * 1024 * 1024 * 1024 bytes)
+        max_size = 2 * 1024 * 1024 * 1024  # 2GB in bytes
+        try:
+            current_size = self.get_csv_file_size(file_path)
+            if current_size >= max_size:
+                print(f"CSV file {file_path} has reached the maximum size limit of 2GB. Skipping write.")
+                return
+        except FileNotFoundError:
+            # File doesn't exist yet, size is 0
+            pass
 
         # Open file in append mode
         with open(file_path, mode='a', newline='') as file:
@@ -302,6 +314,17 @@ class CSVTracker:
                         print(f"Error processing arbitrage for {crypto}: {str(e)}")
                         continue
 
+    
+    def get_csv_file_size(self, file_path: str) -> int:
+        """
+        Return the size of the given CSV file in bytes.
+        Raises:
+            FileNotFoundError: If the file does not exist.
+        """
+        if not os.path.exists(file_path):
+            raise FileNotFoundError(f"CSV file not found: {file_path}")
+        return os.path.getsize(file_path)
+    
     def get_arbitrage_strategy(self):
         """
         Get the arbitrage strategy based on the data from the cross exchnage arbitrage class
